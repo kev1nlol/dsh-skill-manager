@@ -1,0 +1,47 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate bundle manifest
+        run: |
+          node -e "const p=require('./package.json'); const fs=require('node:fs');
+            const fail=(m)=>{console.error(m); process.exit(1)};
+            if(!p.dsh || !p.dsh.bundle || !p.dsh.bundle.patch) fail('missing dsh.bundle.patch');
+            if(!fs.existsSync(p.dsh.bundle.patch)) fail('patch file missing: '+p.dsh.bundle.patch);
+            if(!p.dsh.client || p.dsh.client.platform!=='web') fail('missing dsh.client.platform: web');
+            for (const t of ['./index.js','./client.js','./icon.svg','./locale/en.json','./locale/zh.json'])
+              if(!fs.existsSync(t)) fail('missing runtime file: '+t);
+            for (const name of ['en','zh']) {
+              const meta = JSON.parse(fs.readFileSync('./locale/'+name+'.json','utf8')).meta;
+              if(!meta || !meta.title || !meta.description) fail('locale '+name+' needs meta.title and meta.description');
+            }
+            console.log('bundle manifest ok:', p.name, p.version);"
+
+      - name: Syntax check
+        run: |
+          node --check index.js
+          node --check client.js
+
+      - name: Client module id matches the package name
+        run: |
+          node -e "const fs=require('node:fs');
+            const pkg=require('./package.json');
+            const id=(fs.readFileSync('client.js','utf8').match(/id:\s*'([^']+)'/)||[])[1];
+            if(id!==pkg.name) { console.error('client id '+id+' !== package name '+pkg.name); process.exit(1) }
+            console.log('client module id ok:', id);"
