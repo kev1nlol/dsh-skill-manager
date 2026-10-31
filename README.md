@@ -1,5 +1,7 @@
 # SKILL 管理（DeepSeek Harness 插件）
 
+![check](https://github.com/kev1nlol/dsh-skill-manager/actions/workflows/check.yml/badge.svg)
+
 给 [DeepSeek Harness](https://github.com/deepseek-ai) 增加一个侧栏 **SKILL 管理**面板：把已安装的技能按你自己的方式分组，并逐个启用 / 关闭。开关决定这个技能是否还被索引——模型的技能目录、`skill` 工具、`/技能名` 手势、输入框的 `/` 技能菜单——全程不改动、不删除任何技能文件。
 
 > 第三方插件，与 DeepSeek 官方无隶属关系。
