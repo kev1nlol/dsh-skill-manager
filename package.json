@@ -1,0 +1,66 @@
+{
+  "name": "@kev1nlol/dsh-skill-manager",
+  "version": "1.1.0",
+  "description": "SKILL manager for DeepSeek Harness: a sidebar panel that groups installed skills and turns them on or off, deciding whether the skill catalog, the skill tool, and / commands still index them.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "README.zh.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "plugin",
+    "bundle",
+    "skill",
+    "skills",
+    "skill-manager",
+    "web-ui"
+  ],
+  "author": "kev1nlol",
+  "license": "MIT",
+  "homepage": "https://github.com/kev1nlol/dsh-skill-manager#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kev1nlol/dsh-skill-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kev1nlol/dsh-skill-manager/issues"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0",
+    "dsh": ">=0.2.1-rc.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  }
+}

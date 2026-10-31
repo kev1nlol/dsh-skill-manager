@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "SKILL Manager",
+    "description": "Adds a SKILL manager panel to the sidebar for grouping skills and turning them on or off, which decides whether they are indexed in the skill catalog and / commands."
+  }
+}
