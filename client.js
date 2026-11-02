@@ -13,7 +13,7 @@ window.__ModuleLoader__.load({
     const ZH = {
       'nav.title': 'SKILL 管理',
       'page.title': 'SKILL 管理',
-      'page.subtitle': '给技能分组、批量或逐个启用关闭。关闭后技能文件保留，但不会再出现在技能目录与 / 指令里。',
+      'page.subtitle': '整理分组，并决定哪些技能还出现在技能目录与 / 指令里。',
       'page.refresh': '刷新',
       'page.loading': '正在读取技能…',
       'page.empty': '还没有发现任何技能。',
@@ -21,51 +21,52 @@ window.__ModuleLoader__.load({
       'page.ungrouped': '未分组',
       'page.newGroup': '新分组名称',
       'page.addGroup': '新建分组',
-      'page.deleteGroup': '删除分组',
-      'page.confirmDeleteGroup': '确认删除分组',
-      'page.deleteHint': '只删除这个分组：组内技能会回到「未分组」，技能本身、启用状态和文件都不会改变。',
-      'page.groupPicker': '移动到分组',
-      'page.cancel': '取消',
-      'page.on': '已启用',
-      'page.off': '已关闭',
-      'page.missing': '来源已不存在',
       'page.filterAll': '全部',
       'page.filterOn': '已启用',
       'page.filterOff': '已关闭',
-      'page.searchPlaceholder': '搜索技能名称或描述',
-      'page.invert': '反选',
-      'page.visible': '可见',
-      'page.noMatch': '没有匹配的技能。',
+      'page.searchPlaceholder': '搜索名称、描述或来源',
       'page.clearFilters': '清除筛选',
-      'page.footer': '分组只是给你自己归类用的记录：它不改变技能是否启用、是否被索引、加载什么内容，也不影响任何其他行为。只有「已启用 / 已关闭」开关会改变索引状态，而且开关也不会删除或修改技能文件。',
+      'page.noMatch': '没有匹配的技能。',
+      'page.on': '已启用',
+      'page.off': '已关闭',
+      'page.missing': '来源已不存在',
+      'page.selectOne': '选择此技能',
+      'page.selectSection': '选择本节全部技能',
+      'page.selected': '已选',
+      'page.batchMode': '批量管理',
+      'page.done': '完成',
+      'page.selectAll': '全选',
+      'page.invert': '反选',
+      'page.batchClear': '清空',
+      'page.batchEnable': '启用',
+      'page.batchDisable': '关闭',
+      'page.batchMove': '移到分组…',
+      'page.batchUngroup': '移出分组',
+      'page.collapse': '折叠',
+      'page.expand': '展开',
+      'page.collapseAll': '全部折叠',
+      'page.expandAll': '全部展开',
+      'page.actions': '更多操作',
+      'page.moveUp': '上移',
+      'page.moveDown': '下移',
+      'page.moveTop': '置顶',
+      'page.moveBottom': '置底',
+      'page.rename': '重命名',
+      'page.renameSave': '保存',
+      'page.renameCancel': '取消',
+      'page.renamePlaceholder': '分组名称',
+      'page.deleteGroup': '删除分组',
+      'page.confirmDeleteGroup': '确认删除分组',
+      'page.deleteHint': '只删除这个分组，组内技能会回到「未分组」；技能本身、启用状态和文件都不会改变。',
+      'page.groupPicker': '移动到分组',
+      'page.cancel': '取消',
+      'page.footer': '分组只是整理用的记录：不会改变技能是否启用、是否被索引，也不会改动技能文件。',
       'page.errorFetch': '无法连接宿主服务。',
       'page.hintFetch': '请通过 Web 界面的 http 地址打开本页并刷新；如果仍然失败，请查看 Harness 日志。',
       'page.retry': '重试',
       'page.incomplete': '目录扫描不完整，结果可能有遗漏。',
       'page.noAgent': '当前没有活动会话，技能来源可能列不全。',
       'page.savedTo': '状态文件',
-      'page.selectOne': '选择此技能',
-      'page.selectSection': '选择本节全部技能',
-      'page.selected': '已选',
-      'page.batchEnable': '批量启用',
-      'page.batchDisable': '批量关闭',
-      'page.batchMove': '移动到分组…',
-      'page.batchUngroup': '移出分组',
-      'page.batchClear': '清空',
-      'page.batchMode': '批量管理',
-      'page.batchExit': '退出批量',
-      'page.selectAll': '全选',
-      'page.moveUp': '上移',
-      'page.moveDown': '下移',
-      'page.collapse': '折叠',
-      'page.expand': '展开',
-      'page.collapseAll': '全部折叠',
-      'page.expandAll': '全部展开',
-      'page.rename': '重命名',
-      'page.renameSave': '保存',
-      'page.renameCancel': '取消',
-      'page.renamePlaceholder': '分组名称',
-      'page.dragHint': '拖动排序',
       'page.applied': '已应用',
       'page.skipped': '跳过',
     }
@@ -73,7 +74,7 @@ window.__ModuleLoader__.load({
     const EN = {
       'nav.title': 'SKILL Manager',
       'page.title': 'SKILL Manager',
-      'page.subtitle': 'Group skills and turn them on or off one by one or in bulk. A skill turned off keeps its files but leaves the skill catalog and the / skill commands.',
+      'page.subtitle': 'Organize groups and decide which skills still appear in the catalog and / commands.',
       'page.refresh': 'Refresh',
       'page.loading': 'Reading skills…',
       'page.empty': 'No skills were discovered yet.',
@@ -81,52 +82,53 @@ window.__ModuleLoader__.load({
       'page.ungrouped': 'Ungrouped',
       'page.newGroup': 'New group name',
       'page.addGroup': 'Create group',
-      'page.deleteGroup': 'Delete group',
-      'page.confirmDeleteGroup': 'Confirm delete group',
-      'page.deleteHint': 'Deletes only this group: its skills move back to Ungrouped, and the skills themselves, their on/off state, and their files stay untouched.',
-      'page.groupPicker': 'Move to group',
-      'page.cancel': 'Cancel',
-      'page.on': 'On',
-      'page.off': 'Off',
-      'page.missing': 'source missing',
       'page.filterAll': 'All',
       'page.filterOn': 'Enabled',
       'page.filterOff': 'Disabled',
-      'page.searchPlaceholder': 'Search name or description',
-      'page.invert': 'Invert',
-      'page.visible': 'visible',
-      'page.noMatch': 'No skills match the current filters.',
+      'page.searchPlaceholder': 'Search name, description, or source',
       'page.clearFilters': 'Clear filters',
-      'page.footer': 'Groups are pure bookkeeping for you: they never change whether a skill is on, whether it is indexed, what it loads, or any other behavior. The on/off switch is the only thing that changes indexing, and it deletes or edits no skill file.',
+      'page.noMatch': 'No skills match the current filters.',
+      'page.on': 'On',
+      'page.off': 'Off',
+      'page.missing': 'source missing',
+      'page.selectOne': 'Select this skill',
+      'page.selectSection': 'Select every skill in this section',
+      'page.selected': 'selected',
+      'page.batchMode': 'Batch actions',
+      'page.done': 'Done',
+      'page.selectAll': 'Select all',
+      'page.invert': 'Invert',
+      'page.batchClear': 'Clear',
+      'page.batchEnable': 'Enable',
+      'page.batchDisable': 'Disable',
+      'page.batchMove': 'Move to group…',
+      'page.batchUngroup': 'Remove from group',
+      'page.collapse': 'Collapse',
+      'page.expand': 'Expand',
+      'page.collapseAll': 'Collapse all',
+      'page.expandAll': 'Expand all',
+      'page.actions': 'More actions',
+      'page.moveUp': 'Move up',
+      'page.moveDown': 'Move down',
+      'page.moveTop': 'Move to top',
+      'page.moveBottom': 'Move to bottom',
+      'page.rename': 'Rename',
+      'page.renameSave': 'Save',
+      'page.renameCancel': 'Cancel',
+      'page.renamePlaceholder': 'Group name',
+      'page.deleteGroup': 'Delete group',
+      'page.confirmDeleteGroup': 'Confirm delete',
+      'page.deleteHint': 'Only this group is deleted; its skills move back to Ungrouped. Skills, their on/off state, and their files stay untouched.',
+      'page.groupPicker': 'Move to group',
+      'page.cancel': 'Cancel',
+      'page.footer': 'Groups are only labels: they never change whether a skill is on or indexed, and no skill file is touched.',
       'page.errorFetch': 'Cannot reach the host service.',
       'page.hintFetch': 'Open this page through the Web GUI http address and reload; if it still fails, check the Harness log.',
       'page.retry': 'Retry',
       'page.incomplete': 'Catalog discovery was incomplete, so this list may miss skills.',
       'page.noAgent': 'No live session right now, so skill sources may be incomplete.',
       'page.savedTo': 'State file',
-      'page.selectOne': 'Select this skill',
-      'page.selectSection': 'Select every skill in this section',
-      'page.selected': 'selected',
-      'page.batchEnable': 'Enable selected',
-      'page.batchDisable': 'Disable selected',
-      'page.batchMove': 'Move to group…',
-      'page.batchUngroup': 'Remove from group',
-      'page.batchClear': 'Clear',
-      'page.batchMode': 'Batch actions',
-      'page.batchExit': 'Exit batch',
-      'page.selectAll': 'Select all',
-      'page.moveUp': 'Move up',
-      'page.moveDown': 'Move down',
-      'page.collapse': 'Collapse',
-      'page.expand': 'Expand',
-      'page.collapseAll': 'Collapse all',
-      'page.expandAll': 'Expand all',
-      'page.rename': 'Rename',
-      'page.renameSave': 'Save',
-      'page.renameCancel': 'Cancel',
-      'page.renamePlaceholder': 'Group name',
-      'page.dragHint': 'Drag to reorder',
-      'page.applied': 'Applied to',
+      'page.applied': 'Applied',
       'page.skipped': 'skipped',
     }
 
@@ -137,33 +139,41 @@ window.__ModuleLoader__.load({
         boxSizing: 'border-box',
         background: 'var(--dsw-alias-bg-base)',
         color: 'var(--dsw-alias-label-primary)',
-        padding: '28px 28px 48px',
+        padding: '26px 28px 48px',
       },
-      inner: { maxWidth: 940, margin: '0 auto' },
+      inner: { maxWidth: 900, margin: '0 auto' },
       header: { display: 'flex', alignItems: 'flex-start', gap: 16, justifyContent: 'space-between' },
-      title: { margin: 0, fontSize: 20, fontWeight: 600, lineHeight: '28px' },
+      title: { margin: 0, fontSize: 19, fontWeight: 600, lineHeight: '26px' },
       subtitle: {
-        margin: '6px 0 0',
-        fontSize: 13,
-        lineHeight: '20px',
-        color: 'var(--dsw-alias-label-secondary)',
-        maxWidth: 620,
-      },
-      stats: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 6,
-        marginTop: 12,
+        margin: '4px 0 0',
         fontSize: 12,
+        lineHeight: '18px',
         color: 'var(--dsw-alias-label-secondary)',
+        maxWidth: 560,
+      },
+      filters: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginTop: 16 },
+      search: {
+        flex: '1 1 220px',
+        height: 30,
+        minWidth: 180,
+        maxWidth: 340,
+        boxSizing: 'border-box',
+        padding: '0 10px',
+        borderRadius: 8,
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: 'var(--dsw-alias-bg-layer-1)',
+        color: 'var(--dsw-alias-label-primary)',
+        font: 'inherit',
+        fontSize: 12,
+        outline: 'none',
       },
       chip: {
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 6,
-        height: 24,
+        gap: 5,
+        height: 26,
         padding: '0 10px',
-        borderRadius: 12,
+        borderRadius: 13,
         border: '1px solid var(--dsw-alias-border-l1)',
         background: 'transparent',
         color: 'var(--dsw-alias-label-secondary)',
@@ -175,10 +185,10 @@ window.__ModuleLoader__.load({
       chipActive: {
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 6,
-        height: 24,
+        gap: 5,
+        height: 26,
         padding: '0 10px',
-        borderRadius: 12,
+        borderRadius: 13,
         border: '1px solid var(--dsw-alias-brand-primary)',
         background: 'transparent',
         color: 'var(--dsw-alias-brand-primary)',
@@ -188,70 +198,20 @@ window.__ModuleLoader__.load({
         cursor: 'pointer',
         flex: '0 0 auto',
       },
-      chipCount: { fontSize: 11, opacity: 0.8 },
-      filterRow: { display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center', marginTop: 10 },
-      search: {
-        height: 30,
-        width: 240,
-        minWidth: 180,
-        boxSizing: 'border-box',
-        padding: '0 10px',
-        borderRadius: 8,
-        border: '1px solid var(--dsw-alias-border-l1)',
-        background: 'var(--dsw-alias-bg-layer-1)',
-        color: 'var(--dsw-alias-label-primary)',
-        font: 'inherit',
-        fontSize: 12,
-        outline: 'none',
-      },
-      button: {
-        display: 'inline-flex',
+      chipCount: { fontSize: 11, opacity: 0.75 },
+      toolbar: {
+        display: 'flex',
+        flexWrap: 'wrap',
         alignItems: 'center',
-        gap: 6,
-        height: 30,
-        padding: '0 12px',
-        borderRadius: 8,
-        border: '1px solid var(--dsw-alias-border-l2)',
-        background: 'transparent',
-        color: 'var(--dsw-alias-label-primary)',
-        font: 'inherit',
-        fontSize: 12,
-        cursor: 'pointer',
-        flex: '0 0 auto',
+        gap: 8,
+        marginTop: 12,
+        paddingBottom: 12,
+        borderBottom: '1px solid var(--dsw-alias-border-l1)',
       },
-      buttonPrimary: {
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 6,
-        height: 30,
-        padding: '0 12px',
-        borderRadius: 8,
-        border: '1px solid var(--dsw-alias-brand-primary)',
-        background: 'transparent',
-        color: 'var(--dsw-alias-brand-primary)',
-        font: 'inherit',
-        fontSize: 12,
-        fontWeight: 600,
-        cursor: 'pointer',
-        flex: '0 0 auto',
-      },
-      buttonQuiet: {
-        display: 'inline-flex',
-        alignItems: 'center',
-        height: 24,
-        padding: '0 8px',
-        borderRadius: 6,
-        border: '1px solid var(--dsw-alias-border-l1)',
-        background: 'transparent',
-        color: 'var(--dsw-alias-label-secondary)',
-        font: 'inherit',
-        fontSize: 11,
-        cursor: 'pointer',
-        flex: '0 0 auto',
-      },
+      divider: { width: 1, height: 18, background: 'var(--dsw-alias-border-l1)', flex: '0 0 auto' },
       input: {
         height: 30,
-        width: 220,
+        width: 180,
         boxSizing: 'border-box',
         padding: '0 10px',
         borderRadius: 8,
@@ -263,8 +223,8 @@ window.__ModuleLoader__.load({
         outline: 'none',
       },
       renameInput: {
-        height: 24,
-        width: 180,
+        height: 26,
+        width: 190,
         boxSizing: 'border-box',
         padding: '0 8px',
         borderRadius: 6,
@@ -275,9 +235,91 @@ window.__ModuleLoader__.load({
         fontSize: 13,
         outline: 'none',
       },
-      toolbar: { display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 20, alignItems: 'center' },
+      button: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        height: 28,
+        padding: '0 10px',
+        borderRadius: 7,
+        border: '1px solid var(--dsw-alias-border-l2)',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-primary)',
+        font: 'inherit',
+        fontSize: 12,
+        cursor: 'pointer',
+        flex: '0 0 auto',
+        whiteSpace: 'nowrap',
+      },
+      buttonPrimary: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 30,
+        padding: '0 12px',
+        borderRadius: 8,
+        border: '1px solid var(--dsw-alias-brand-primary)',
+        background: 'transparent',
+        color: 'var(--dsw-alias-brand-primary)',
+        font: 'inherit',
+        fontSize: 12,
+        fontWeight: 600,
+        cursor: 'pointer',
+        flex: '0 0 auto',
+        whiteSpace: 'nowrap',
+      },
+      buttonQuiet: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 24,
+        padding: '0 8px',
+        borderRadius: 6,
+        border: '1px solid transparent',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-secondary)',
+        font: 'inherit',
+        fontSize: 11,
+        cursor: 'pointer',
+        flex: '0 0 auto',
+        whiteSpace: 'nowrap',
+      },
+      buttonDanger: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 24,
+        padding: '0 8px',
+        borderRadius: 6,
+        border: '1px solid var(--dsw-alias-state-error-primary)',
+        background: 'transparent',
+        color: 'var(--dsw-alias-state-error-primary)',
+        font: 'inherit',
+        fontSize: 11,
+        cursor: 'pointer',
+        flex: '0 0 auto',
+        whiteSpace: 'nowrap',
+      },
+      iconButton: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 24,
+        height: 24,
+        padding: 0,
+        borderRadius: 6,
+        border: '1px solid transparent',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-secondary)',
+        font: 'inherit',
+        fontSize: 12,
+        lineHeight: '16px',
+        cursor: 'pointer',
+        flex: '0 0 auto',
+      },
       banner: {
-        marginTop: 16,
+        marginTop: 12,
         padding: '10px 12px',
         borderRadius: 8,
         border: '1px solid var(--dsw-alias-state-error-primary)',
@@ -288,8 +330,8 @@ window.__ModuleLoader__.load({
         overflowWrap: 'anywhere',
       },
       notice: {
-        marginTop: 16,
-        padding: '10px 12px',
+        marginTop: 12,
+        padding: '9px 12px',
         borderRadius: 8,
         border: '1px solid var(--dsw-alias-border-l1)',
         background: 'var(--dsw-alias-bg-layer-1)',
@@ -298,7 +340,7 @@ window.__ModuleLoader__.load({
         lineHeight: '18px',
       },
       note: {
-        marginTop: 14,
+        marginTop: 12,
         padding: '8px 12px',
         borderRadius: 8,
         border: '1px solid var(--dsw-alias-state-success-primary)',
@@ -306,62 +348,32 @@ window.__ModuleLoader__.load({
         fontSize: 12,
         lineHeight: '18px',
       },
-      batchBar: {
-        position: 'sticky',
-        bottom: 0,
-        zIndex: 3,
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        gap: 8,
-        marginTop: 18,
-        padding: '10px 12px',
-        borderRadius: 10,
-        border: '1px solid var(--dsw-alias-brand-primary)',
-        background: 'var(--dsw-alias-bg-overlay)',
-      },
-      batchCount: { fontSize: 12, fontWeight: 600, color: 'var(--dsw-alias-brand-primary)' },
-      iconButton: {
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 22,
-        height: 22,
-        padding: 0,
-        borderRadius: 6,
-        border: '1px solid var(--dsw-alias-border-l1)',
-        background: 'transparent',
-        color: 'var(--dsw-alias-label-secondary)',
-        font: 'inherit',
-        fontSize: 11,
-        lineHeight: '16px',
-        cursor: 'pointer',
-        flex: '0 0 auto',
-      },
-      section: { marginTop: 22 },
+      section: { marginTop: 18 },
       sectionHead: {
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
-        padding: '4px 2px 8px',
-        borderRadius: 8,
+        gap: 6,
+        padding: '5px 6px',
+        margin: '0 -6px',
+        borderRadius: 7,
         flexWrap: 'wrap',
       },
-      sectionHeadDrop: {
-        boxShadow: 'inset 0 2px 0 0 var(--dsw-alias-brand-primary)',
-      },
       sectionTitle: { fontSize: 13, fontWeight: 600, color: 'var(--dsw-alias-label-primary)' },
-      sectionCount: { fontSize: 12, color: 'var(--dsw-alias-label-secondary)' },
-      sectionHint: {
-        fontSize: 11,
-        lineHeight: '16px',
+      countPill: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        height: 18,
+        padding: '0 7px',
+        borderRadius: 9,
+        background: 'var(--dsw-alias-bg-layer-2)',
         color: 'var(--dsw-alias-label-secondary)',
-        textAlign: 'right',
-        flex: '0 1 auto',
+        fontSize: 10,
+        lineHeight: '16px',
+        flex: '0 0 auto',
       },
       chevron: {
-        width: 18,
-        height: 18,
+        width: 20,
+        height: 20,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -373,15 +385,6 @@ window.__ModuleLoader__.load({
         fontSize: 10,
         flex: '0 0 auto',
       },
-      handle: {
-        cursor: 'grab',
-        color: 'var(--dsw-alias-label-secondary)',
-        fontSize: 12,
-        lineHeight: '16px',
-        userSelect: 'none',
-        padding: '0 2px',
-        flex: '0 0 auto',
-      },
       checkbox: {
         width: 14,
         height: 14,
@@ -390,92 +393,172 @@ window.__ModuleLoader__.load({
         cursor: 'pointer',
         flex: '0 0 auto',
       },
+      menuWrap: { position: 'relative', display: 'inline-flex', flex: '0 0 auto' },
+      menu: {
+        position: 'absolute',
+        top: '100%',
+        right: 0,
+        marginTop: 4,
+        zIndex: 30,
+        minWidth: 148,
+        padding: 4,
+        borderRadius: 8,
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: 'var(--dsw-alias-bg-overlay)',
+      },
+      menuItem: {
+        display: 'flex',
+        alignItems: 'center',
+        width: '100%',
+        height: 28,
+        padding: '0 8px',
+        border: 'none',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-primary)',
+        font: 'inherit',
+        fontSize: 12,
+        borderRadius: 6,
+        cursor: 'pointer',
+        textAlign: 'left',
+        whiteSpace: 'nowrap',
+      },
+      menuItemDanger: {
+        display: 'flex',
+        alignItems: 'center',
+        width: '100%',
+        height: 28,
+        padding: '0 8px',
+        border: 'none',
+        background: 'transparent',
+        color: 'var(--dsw-alias-state-error-primary)',
+        font: 'inherit',
+        fontSize: 12,
+        borderRadius: 6,
+        cursor: 'pointer',
+        textAlign: 'left',
+        whiteSpace: 'nowrap',
+      },
+      sectionConfirm: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: 8,
+        margin: '2px 0 8px',
+        padding: '8px 10px',
+        borderRadius: 8,
+        border: '1px solid var(--dsw-alias-state-warn-primary)',
+        color: 'var(--dsw-alias-label-secondary)',
+        fontSize: 11,
+        lineHeight: '16px',
+      },
       card: {
         border: '1px solid var(--dsw-alias-border-l1)',
         borderRadius: 10,
         overflow: 'hidden',
         background: 'var(--dsw-alias-bg-layer-1)',
       },
-      row: { display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 14px' },
+      row: { display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px' },
       rowDivider: { borderTop: '1px solid var(--dsw-alias-border-l1)' },
       rowMain: { flex: '1 1 auto', minWidth: 0 },
-      rowTitle: { display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
+      rowTitle: { display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', minWidth: 0 },
       skillName: {
         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
-        fontSize: 13,
+        fontSize: 12.5,
         fontWeight: 600,
         color: 'var(--dsw-alias-label-primary)',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        flex: '0 1 auto',
       },
       description: {
-        marginTop: 4,
-        fontSize: 12,
-        lineHeight: '18px',
+        marginTop: 2,
+        fontSize: 11.5,
+        lineHeight: '17px',
         color: 'var(--dsw-alias-label-secondary)',
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
         overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
       },
       badge: {
         display: 'inline-flex',
         alignItems: 'center',
-        height: 18,
+        height: 17,
         padding: '0 6px',
-        borderRadius: 6,
+        borderRadius: 5,
         border: '1px solid var(--dsw-alias-border-l1)',
         color: 'var(--dsw-alias-label-secondary)',
         fontSize: 10,
-        lineHeight: '16px',
+        lineHeight: '15px',
         whiteSpace: 'nowrap',
+        flex: '0 0 auto',
       },
       badgeWarn: {
         display: 'inline-flex',
         alignItems: 'center',
-        height: 18,
+        height: 17,
         padding: '0 6px',
-        borderRadius: 6,
+        borderRadius: 5,
         border: '1px solid var(--dsw-alias-state-warn-primary)',
         color: 'var(--dsw-alias-state-warn-primary)',
         fontSize: 10,
-        lineHeight: '16px',
+        lineHeight: '15px',
         whiteSpace: 'nowrap',
+        flex: '0 0 auto',
+      },
+      groupPicker: {
+        height: 24,
+        maxWidth: 130,
+        boxSizing: 'border-box',
+        padding: '0 6px',
+        borderRadius: 6,
+        border: '1px solid transparent',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-secondary)',
+        font: 'inherit',
+        fontSize: 11,
+        cursor: 'pointer',
+        flex: '0 0 auto',
       },
       select: {
-        height: 28,
+        height: 26,
         maxWidth: 150,
         boxSizing: 'border-box',
         padding: '0 6px',
-        borderRadius: 8,
+        borderRadius: 7,
         border: '1px solid var(--dsw-alias-border-l1)',
         background: 'var(--dsw-alias-bg-layer-2)',
         color: 'var(--dsw-alias-label-primary)',
         font: 'inherit',
-        fontSize: 12,
+        fontSize: 11.5,
         flex: '0 0 auto',
       },
       muted: { fontSize: 12, color: 'var(--dsw-alias-label-secondary)', lineHeight: '18px' },
-      emptyRow: { padding: '12px 14px', fontSize: 12, color: 'var(--dsw-alias-label-secondary)' },
+      emptyRow: { padding: '10px 12px', fontSize: 11.5, color: 'var(--dsw-alias-label-secondary)' },
       footer: {
-        marginTop: 26,
-        paddingTop: 14,
+        marginTop: 22,
+        paddingTop: 12,
         borderTop: '1px solid var(--dsw-alias-border-l1)',
-        fontSize: 11,
-        lineHeight: '18px',
+        fontSize: 10.5,
+        lineHeight: '17px',
         color: 'var(--dsw-alias-label-secondary)',
         overflowWrap: 'anywhere',
       },
     }
 
-    // Component-local enhancements that inline styles cannot express: hover
-    // feedback and a visible keyboard focus ring. Rendered as an element so
-    // unmounting the panel removes them.
+    // Component-local enhancements that inline styles cannot express. Rendered
+    // as an element so unmounting the panel removes them with everything else.
     const STYLE_TEXT = [
       '.sm-panel .sm-row { transition: background 120ms ease; }',
       '.sm-panel .sm-row:hover { background: var(--dsw-alias-bg-layer-2); }',
+      '.sm-panel .sm-row:hover .sm-group-picker { border-color: var(--dsw-alias-border-l1); }',
+      '.sm-panel .sm-section-head:hover { background: var(--dsw-alias-bg-layer-1); }',
+      '.sm-panel .sm-menu-item:hover:not(:disabled) { background: var(--dsw-alias-bg-layer-2); }',
       '.sm-panel button:focus-visible, .sm-panel input:focus-visible, .sm-panel select:focus-visible {',
       '  outline: 2px solid var(--dsw-alias-brand-primary);',
       '  outline-offset: 1px;',
       '}',
+      '.sm-panel button:disabled { opacity: 0.45; cursor: default; }',
     ].join('\n')
 
     function messageOf(failure) {
@@ -567,9 +650,9 @@ window.__ModuleLoader__.load({
           display: 'inline-flex',
           alignItems: 'center',
           gap: 6,
-          height: 26,
+          height: 24,
           padding: '0 10px',
-          borderRadius: 13,
+          borderRadius: 12,
           border: `1px solid ${on ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-border-l2)'}`,
           background: 'transparent',
           color: on ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-state-idle-primary)',
@@ -599,6 +682,7 @@ window.__ModuleLoader__.load({
       const ui = props.ui
       const skill = props.skill
       const busy = ui.pending !== ''
+      const selected = ui.selected.has(skill.name)
       const title = [h('span', { key: 'name', style: S.skillName }, skill.name)]
       if (typeof skill.source === 'string' && skill.source !== '') {
         title.push(h(Badge, { key: 'source' }, skill.source))
@@ -606,7 +690,6 @@ window.__ModuleLoader__.load({
       if (skill.available === false) {
         title.push(h(Badge, { key: 'missing', warn: true }, t('page.missing')))
       }
-      const selected = ui.selected.has(skill.name)
       const children = []
       if (ui.selectionMode) {
         children.push(h('input', {
@@ -621,39 +704,22 @@ window.__ModuleLoader__.load({
       }
       children.push(h('div', {
         key: 'main',
-        style: ui.selectionMode
-          ? Object.assign({}, S.rowMain, {
-            cursor: 'pointer',
-            borderRadius: 6,
-            padding: '2px 6px',
-            margin: '-2px -6px',
-            background: selected ? 'var(--dsw-alias-bg-layer-2)' : 'transparent',
-          })
-          : S.rowMain,
+        style: ui.selectionMode ? Object.assign({}, S.rowMain, { cursor: 'pointer' }) : S.rowMain,
         onClick: ui.selectionMode ? () => ui.onSelectSkill(skill.name) : undefined,
-        onKeyDown: ui.selectionMode
-          ? (event) => {
-            if (event.key !== 'Enter' && event.key !== ' ') return
-            event.preventDefault()
-            ui.onSelectSkill(skill.name)
-          }
-          : undefined,
-        role: ui.selectionMode ? 'button' : undefined,
-        tabIndex: ui.selectionMode ? 0 : undefined,
-        'aria-pressed': ui.selectionMode ? (selected ? 'true' : 'false') : undefined,
       }, [
         h('div', { key: 'title', style: S.rowTitle }, title),
         typeof skill.description === 'string' && skill.description !== ''
-          ? h('div', { key: 'description', style: S.description }, skill.description)
+          ? h('div', { key: 'description', style: S.description, title: skill.description }, skill.description)
           : null,
       ]))
       children.push(
         h('select', {
           key: 'group',
+          className: 'sm-group-picker',
           value: typeof skill.groupId === 'string' ? skill.groupId : '',
           disabled: busy || ui.groups.length === 0,
           onChange: (event) => ui.onAssignSkill(skill.name, event.target.value),
-          style: S.select,
+          style: S.groupPicker,
           title: t('page.groupPicker'),
           'aria-label': t('page.groupPicker'),
         }, [h('option', { key: '', value: '' }, t('page.ungrouped'))].concat(
@@ -682,25 +748,13 @@ window.__ModuleLoader__.load({
       const collapsed = ui.collapsed.has(sectionKey)
       const renaming = group !== null && ui.renaming !== null && ui.renaming.id === group.id
       const confirming = group !== null && ui.confirming === group.id
-      const dropTarget = group !== null && ui.dragOver === group.id
-      const dragging = group !== null && ui.dragId === group.id
+      const menuOpen = group !== null && ui.menuGroupId === group.id
       const allSelected = skills.length > 0 && skills.every((skill) => ui.selected.has(skill.name))
+      const isFirst = group !== null && props.index === 0
+      const isLast = group !== null && props.index === props.groupCount - 1
 
       const head = []
-      const chevron = h('button', {
-        key: 'chevron',
-        type: 'button',
-        'aria-expanded': collapsed ? 'false' : 'true',
-        'aria-label': collapsed ? t('page.expand') : t('page.collapse'),
-        title: collapsed ? t('page.expand') : t('page.collapse'),
-        onClick: () => ui.onToggleCollapse(sectionKey),
-        style: S.chevron,
-      }, collapsed ? '▸' : '▾')
-
       if (ui.selectionMode) {
-        // Batch mode keeps the header to what selection needs: collapse,
-        // section checkbox, and the label. Row actions live in the sticky bar.
-        head.push(chevron)
         head.push(h('input', {
           key: 'selectSect',
           type: 'checkbox',
@@ -710,101 +764,77 @@ window.__ModuleLoader__.load({
           onChange: () => ui.onSelectSection(sectionKey),
           style: S.checkbox,
         }))
-        head.push(h('span', { key: 'title', style: S.sectionTitle }, group === null ? t('page.ungrouped') : group.name))
-        head.push(h('span', { key: 'count', style: S.sectionCount }, props.countLabel))
-        head.push(h('span', { key: 'spacer', style: { flex: '1 1 auto' } }))
-      } else {
-        if (group !== null) {
-          head.push(h('span', {
-            key: 'handle',
-            draggable: true,
-            title: t('page.dragHint'),
-            'aria-label': t('page.dragHint'),
-            onDragStart: (event) => {
-              event.dataTransfer.effectAllowed = 'move'
-              event.dataTransfer.setData('text/plain', group.id)
-              ui.onDragStart(group.id)
-            },
-            onDragEnd: () => ui.onDragEnd(),
-            style: S.handle,
-          }, '⠿'))
-        }
-        head.push(chevron)
+      }
+      head.push(h('button', {
+        key: 'chevron',
+        type: 'button',
+        'aria-expanded': collapsed ? 'false' : 'true',
+        'aria-label': collapsed ? t('page.expand') : t('page.collapse'),
+        title: collapsed ? t('page.expand') : t('page.collapse'),
+        onClick: (event) => {
+          event.stopPropagation()
+          ui.onToggleCollapse(sectionKey)
+        },
+        style: S.chevron,
+      }, collapsed ? '▸' : '▾'))
 
-        if (renaming) {
-          head.push(h('input', {
-            key: 'rename',
-            value: ui.renaming.draft,
-            autoFocus: true,
-            maxLength: 40,
-            placeholder: t('page.renamePlaceholder'),
-            'aria-label': t('page.renamePlaceholder'),
-            onChange: (event) => ui.onRenameDraft(event.target.value),
-            onKeyDown: (event) => {
-              if (event.key === 'Enter') ui.onSaveRename()
-              else if (event.key === 'Escape') ui.onCancelRename()
+      if (renaming) {
+        head.push(h('input', {
+          key: 'rename',
+          value: ui.renaming.draft,
+          autoFocus: true,
+          maxLength: 40,
+          placeholder: t('page.renamePlaceholder'),
+          'aria-label': t('page.renamePlaceholder'),
+          onChange: (event) => ui.onRenameDraft(event.target.value),
+          onKeyDown: (event) => {
+            if (event.key === 'Enter') ui.onSaveRename()
+            else if (event.key === 'Escape') ui.onCancelRename()
+          },
+          style: S.renameInput,
+        }))
+        head.push(h('button', {
+          key: 'renameSave',
+          type: 'button',
+          style: S.buttonQuiet,
+          onClick: () => ui.onSaveRename(),
+        }, t('page.renameSave')))
+        head.push(h('button', {
+          key: 'renameCancel',
+          type: 'button',
+          style: S.buttonQuiet,
+          onClick: () => ui.onCancelRename(),
+        }, t('page.renameCancel')))
+      } else {
+        head.push(h('span', { key: 'title', style: S.sectionTitle }, group === null ? t('page.ungrouped') : group.name))
+        head.push(h('span', { key: 'count', style: S.countPill }, props.countLabel))
+        head.push(h('span', { key: 'spacer', style: { flex: '1 1 auto' } }))
+        if (group !== null && !ui.selectionMode) {
+          head.push(h('button', {
+            key: 'up',
+            type: 'button',
+            style: S.iconButton,
+            title: t('page.moveUp'),
+            'aria-label': t('page.moveUp'),
+            disabled: ui.pending !== '' || isFirst,
+            onClick: (event) => {
+              event.stopPropagation()
+              ui.onMoveGroup(group.id, -1)
             },
-            style: S.renameInput,
-          }))
+          }, '↑'))
           head.push(h('button', {
-            key: 'renameSave',
+            key: 'down',
             type: 'button',
-            style: S.buttonQuiet,
-            onClick: () => ui.onSaveRename(),
-          }, t('page.renameSave')))
-          head.push(h('button', {
-            key: 'renameCancel',
-            type: 'button',
-            style: S.buttonQuiet,
-            onClick: () => ui.onCancelRename(),
-          }, t('page.renameCancel')))
-        } else {
-          head.push(h('span', { key: 'title', style: S.sectionTitle }, group === null ? t('page.ungrouped') : group.name))
-          head.push(h('span', { key: 'count', style: S.sectionCount }, props.countLabel))
-          head.push(h('span', { key: 'spacer', style: { flex: '1 1 auto' } }))
-          if (group !== null) {
-            if (confirming) {
-              head.push(h('span', { key: 'hint', style: S.sectionHint }, t('page.deleteHint')))
-              head.push(h('button', {
-                key: 'cancelDelete',
-                type: 'button',
-                style: S.buttonQuiet,
-                onClick: () => ui.onCancelDelete(),
-              }, t('page.cancel')))
-            }
-            head.push(h('button', {
-              key: 'up',
-              type: 'button',
-              style: S.iconButton,
-              title: t('page.moveUp'),
-              'aria-label': t('page.moveUp'),
-              disabled: ui.pending !== '' || props.index === 0,
-              onClick: () => ui.onMoveGroup(group.id, -1),
-            }, '↑'))
-            head.push(h('button', {
-              key: 'down',
-              type: 'button',
-              style: S.iconButton,
-              title: t('page.moveDown'),
-              'aria-label': t('page.moveDown'),
-              disabled: ui.pending !== '' || props.index === props.groupCount - 1,
-              onClick: () => ui.onMoveGroup(group.id, 1),
-            }, '↓'))
-            head.push(h('button', {
-              key: 'renameBtn',
-              type: 'button',
-              style: S.buttonQuiet,
-              title: t('page.rename'),
-              onClick: () => ui.onStartRename(group),
-            }, t('page.rename')))
-            head.push(h('button', {
-              key: 'delete',
-              type: 'button',
-              style: S.buttonQuiet,
-              title: t('page.deleteHint'),
-              onClick: () => ui.onDeleteGroup(group, confirming),
-            }, confirming ? t('page.confirmDeleteGroup') : t('page.deleteGroup')))
-          }
+            style: S.iconButton,
+            title: t('page.moveDown'),
+            'aria-label': t('page.moveDown'),
+            disabled: ui.pending !== '' || isLast,
+            onClick: (event) => {
+              event.stopPropagation()
+              ui.onMoveGroup(group.id, 1)
+            },
+          }, '↓'))
+          head.push(menuNode(t, ui, group, menuOpen, isFirst, isLast))
         }
       }
 
@@ -820,32 +850,96 @@ window.__ModuleLoader__.load({
             first: index === 0,
           }))]
 
-      const headStyle = dropTarget ? Object.assign({}, S.sectionHead, S.sectionHeadDrop) : S.sectionHead
-      return h('section', {
-        style: Object.assign({}, S.section, dragging ? { opacity: 0.55 } : {}),
-        onDragOver: group !== null
-          ? (event) => {
-            if (ui.dragId === null) return
-            event.preventDefault()
-            event.dataTransfer.dropEffect = 'move'
-            ui.onDragOver(group.id)
-          }
-          : undefined,
-        onDragLeave: group !== null
-          ? (event) => {
-            if (event.currentTarget.contains(event.relatedTarget)) return
-            ui.onDragOver(null)
-          }
-          : undefined,
-        onDrop: group !== null
-          ? (event) => {
-            event.preventDefault()
-            ui.onDrop(group.id)
-          }
-          : undefined,
-      }, [
-        h('div', { key: 'head', style: headStyle }, head),
+      const confirmStrip = confirming
+        ? h('div', { key: 'confirm', style: S.sectionConfirm }, [
+          h('span', { key: 'hint', style: { flex: '1 1 240px' } }, t('page.deleteHint')),
+          h('button', {
+            key: 'cancel',
+            type: 'button',
+            style: S.buttonQuiet,
+            onClick: () => ui.onCancelDelete(),
+          }, t('page.cancel')),
+          h('button', {
+            key: 'ok',
+            type: 'button',
+            style: S.buttonDanger,
+            onClick: () => ui.onDeleteGroup(group, true),
+          }, t('page.confirmDeleteGroup')),
+        ])
+        : null
+
+      return h('section', { style: S.section }, [
+        h('div', {
+          key: 'head',
+          className: 'sm-section-head',
+          style: S.sectionHead,
+          onClick: (event) => {
+            if (event.target !== null && event.target.closest !== undefined && event.target.closest('button,input,select')) return
+            ui.onToggleCollapse(sectionKey)
+          },
+        }, head),
+        confirmStrip,
         collapsed ? null : h('div', { key: 'body', style: S.card }, body),
+      ])
+    }
+
+    /**
+     * Group actions live behind one overflow control, so the header keeps a
+     * single quiet row: title, count, then move controls.
+     */
+    function menuNode(t, ui, group, open, isFirst, isLast) {
+      const items = [
+        { key: 'up', label: t('page.moveUp'), disabled: isFirst, run: () => ui.onMoveGroup(group.id, -1) },
+        { key: 'down', label: t('page.moveDown'), disabled: isLast, run: () => ui.onMoveGroup(group.id, 1) },
+        { key: 'top', label: t('page.moveTop'), disabled: isFirst, run: () => ui.onMoveTop(group.id) },
+        { key: 'bottom', label: t('page.moveBottom'), disabled: isLast, run: () => ui.onMoveBottom(group.id) },
+        { key: 'rename', label: t('page.rename'), run: () => ui.onStartRename(group) },
+      ]
+      const children = items.map((item) => h('button', {
+        key: item.key,
+        type: 'button',
+        className: 'sm-menu-item',
+        role: 'menuitem',
+        disabled: item.disabled === true,
+        style: S.menuItem,
+        onClick: (event) => {
+          event.stopPropagation()
+          ui.onCloseMenu()
+          item.run()
+        },
+      }, item.label))
+      children.push(h('button', {
+        key: 'delete',
+        type: 'button',
+        className: 'sm-menu-item',
+        role: 'menuitem',
+        style: S.menuItemDanger,
+        onClick: (event) => {
+          event.stopPropagation()
+          ui.onCloseMenu()
+          ui.onDeleteGroup(group, false)
+        },
+      }, t('page.deleteGroup')))
+
+      return h('div', { key: 'menuWrap', className: 'sm-menu-wrap', style: S.menuWrap }, [
+        h('button', {
+          key: 'trigger',
+          type: 'button',
+          className: 'sm-menu-btn',
+          style: S.iconButton,
+          title: t('page.actions'),
+          'aria-label': t('page.actions'),
+          'aria-haspopup': 'menu',
+          'aria-expanded': open ? 'true' : 'false',
+          onClick: (event) => {
+            event.stopPropagation()
+            if (open) ui.onCloseMenu()
+            else ui.onOpenMenu(group.id)
+          },
+        }, '⋯'),
+        open
+          ? h('div', { key: 'menu', className: 'sm-menu', role: 'menu', style: S.menu }, children)
+          : null,
       ])
     }
 
@@ -858,17 +952,14 @@ window.__ModuleLoader__.load({
         const [pending, setPending] = React.useState('')
         const [draftGroup, setDraftGroup] = React.useState('')
         const [confirmGroup, setConfirmGroup] = React.useState('')
+        const [menuGroupId, setMenuGroupId] = React.useState(null)
         const [renaming, setRenaming] = React.useState(null)
         const [collapsed, setCollapsed] = React.useState(() => readCollapsed())
         const [selected, setSelected] = React.useState(() => new Set())
-        const [dragId, setDragId] = React.useState(null)
-        const [dragOver, setDragOver] = React.useState(null)
         const [selectionMode, setSelectionMode] = React.useState(false)
         const [query, setQuery] = React.useState('')
         const [statusFilter, setStatusFilter] = React.useState('all')
         const alive = React.useRef(true)
-        const dragging = React.useRef(null)
-        const pageRef = React.useRef(null)
 
         React.useEffect(() => () => {
           alive.current = false
@@ -884,12 +975,26 @@ window.__ModuleLoader__.load({
           return () => clearTimeout(timer)
         }, [note])
 
-        // Escape backs out one layer at a time: a rename, then the search, then
-        // batch mode. The listener exists only while one of those is active.
         React.useEffect(() => {
-          if (!selectionMode && renaming === null && query === '') return undefined
+          if (menuGroupId === null) return undefined
+          const onPointerDown = (event) => {
+            const target = event.target
+            if (target instanceof Element && (target.closest('.sm-menu') || target.closest('.sm-menu-btn'))) return
+            setMenuGroupId(null)
+          }
+          document.addEventListener('mousedown', onPointerDown)
+          return () => document.removeEventListener('mousedown', onPointerDown)
+        }, [menuGroupId])
+
+        // Escape backs out one layer at a time: menu, rename, search, batch.
+        React.useEffect(() => {
+          if (menuGroupId === null && !selectionMode && renaming === null && query === '') return undefined
           const onKeyDown = (event) => {
             if (event.key !== 'Escape') return
+            if (menuGroupId !== null) {
+              setMenuGroupId(null)
+              return
+            }
             if (renaming !== null) {
               setRenaming(null)
               return
@@ -905,7 +1010,7 @@ window.__ModuleLoader__.load({
           }
           window.addEventListener('keydown', onKeyDown)
           return () => window.removeEventListener('keydown', onKeyDown)
-        }, [selectionMode, renaming, query])
+        }, [menuGroupId, selectionMode, renaming, query])
 
         const fail = React.useCallback((failure) => {
           const network = failure !== null && typeof failure === 'object' && failure.network === true
@@ -984,14 +1089,23 @@ window.__ModuleLoader__.load({
           )
         }, [act])
 
-        const onSelectSkill = React.useCallback((name) => {
+        const onSelectSkill = (name) => {
           setSelected((previous) => {
             const next = new Set(previous)
             if (next.has(name)) next.delete(name)
             else next.add(name)
             return next
           })
-        }, [])
+        }
+
+        const onToggleCollapse = (sectionKey) => {
+          setCollapsed((previous) => {
+            const next = new Set(previous)
+            if (next.has(sectionKey)) next.delete(sectionKey)
+            else next.add(sectionKey)
+            return next
+          })
+        }
 
         const groups = data !== null && Array.isArray(data.groups) ? data.groups : []
         const skills = data !== null && Array.isArray(data.skills) ? data.skills : []
@@ -1046,11 +1160,9 @@ window.__ModuleLoader__.load({
         }, [query, statusFilter])
 
         const onSelectSection = (sectionKey) => {
-          const inSection = skills.filter((skill) => (
-            sectionKey === 'ungrouped'
-              ? !(typeof skill.groupId === 'string' && byGroup.has(skill.groupId))
-              : skill.groupId === sectionKey
-          ))
+          const inSection = sectionKey === 'ungrouped'
+            ? ungrouped
+            : (byGroup.get(sectionKey) ?? [])
           setSelected((previous) => {
             const next = new Set(previous)
             const all = inSection.length > 0 && inSection.every((skill) => next.has(skill.name))
@@ -1062,26 +1174,47 @@ window.__ModuleLoader__.load({
           })
         }
 
-        const runBatch = React.useCallback(async (op, extra) => {
+        const selectVisibleSkills = () => setSelected(new Set(visibleSkills.map((skill) => skill.name)))
+
+        const invertSelection = () => setSelected((previous) => {
+          const next = new Set(previous)
+          for (const skill of visibleSkills) {
+            if (next.has(skill.name)) next.delete(skill.name)
+            else next.add(skill.name)
+          }
+          return next
+        })
+
+        const runBatch = async (op, extra) => {
           const names = [...selected]
           if (names.length === 0) return
           const next = await act(Object.assign({ action: 'batch', op, names }, extra ?? {}), 'batch')
           if (next !== null && alive.current) setSelected(new Set())
-        }, [act, selected])
-
-        const onBatchMove = (groupId) => {
-          if (groupId === '') return
-          runBatch('assign', { group_id: groupId })
         }
 
-        const onCreateGroup = React.useCallback(async () => {
+        const toggleSelectionMode = () => {
+          if (selectionMode) {
+            setSelectionMode(false)
+            setSelected(new Set())
+            setMenuGroupId(null)
+            return
+          }
+          setSelectionMode(true)
+        }
+
+        const clearFilters = () => {
+          setQuery('')
+          setStatusFilter('all')
+        }
+
+        const onCreateGroup = async () => {
           const name = draftGroup.trim()
           if (name === '') return
           const next = await act({ action: 'create_group', group: name }, 'group:create')
           if (next !== null && alive.current) setDraftGroup('')
-        }, [act, draftGroup])
+        }
 
-        const onDeleteGroup = React.useCallback(async (group, confirming) => {
+        const onDeleteGroup = async (group, confirming) => {
           if (!confirming) {
             setConfirmGroup(group.id)
             return
@@ -1096,9 +1229,12 @@ window.__ModuleLoader__.load({
               return copy
             })
           }
-        }, [act])
+        }
 
-        const onStartRename = (group) => setRenaming({ id: group.id, draft: group.name })
+        const onStartRename = (group) => {
+          setMenuGroupId(null)
+          setRenaming({ id: group.id, draft: group.name })
+        }
 
         const onRenameDraft = (draft) => {
           setRenaming((current) => (current === null ? current : { id: current.id, draft }))
@@ -1106,103 +1242,32 @@ window.__ModuleLoader__.load({
 
         const onCancelRename = () => setRenaming(null)
 
-        const onSaveRename = React.useCallback(async () => {
+        const onSaveRename = async () => {
           if (renaming === null) return
           const name = renaming.draft.trim()
           if (name === '') return
           const next = await act({ action: 'rename_group', group_id: renaming.id, to: name }, 'group:rename')
           if (next !== null && alive.current) setRenaming(null)
-        }, [act, renaming])
-
-        const onToggleCollapse = React.useCallback((sectionKey) => {
-          setCollapsed((previous) => {
-            const next = new Set(previous)
-            if (next.has(sectionKey)) next.delete(sectionKey)
-            else next.add(sectionKey)
-            return next
-          })
-        }, [])
-
-        const onDragStart = (groupId) => {
-          dragging.current = groupId
-          setDragId(groupId)
-          setDragOver(null)
         }
 
-        const onDragOver = (groupId) => setDragOver(groupId)
-
-        const onDragEnd = React.useCallback(() => {
-          dragging.current = null
-          setDragId(null)
-          setDragOver(null)
-        }, [])
-
-        const onDrop = (targetId) => {
-          const source = dragging.current
-          onDragEnd()
-          if (source === null || source === targetId) return
+        const moveGroup = (groupId, targetIndex) => {
           const ids = groups.map((group) => group.id)
-          const from = ids.indexOf(source)
-          const to = ids.indexOf(targetId)
-          if (from < 0 || to < 0) return
+          const from = ids.indexOf(groupId)
+          if (from < 0 || targetIndex < 0 || targetIndex >= ids.length || targetIndex === from) return
           const ordered = ids.slice()
           ordered.splice(from, 1)
-          ordered.splice(to, 0, source)
+          ordered.splice(targetIndex, 0, groupId)
           act({ action: 'reorder_groups', ids: ordered }, 'group:reorder')
-        }
-
-        // A native HTML5 drag suppresses wheel scrolling, so scrolling while
-        // dragging has to be driven explicitly: near either edge of the panel,
-        // every dragover event nudges scrollTop in that direction.
-        const onPageDragOver = (event) => {
-          if (dragging.current === null) return
-          const node = pageRef.current
-          if (node === null) return
-          const rect = node.getBoundingClientRect()
-          const edge = 72
-          const step = (distance) => Math.min(42, 6 + Math.ceil(distance / 3))
-          if (event.clientY < rect.top + edge) {
-            node.scrollTop -= step(rect.top + edge - event.clientY)
-          } else if (event.clientY > rect.bottom - edge) {
-            node.scrollTop += step(event.clientY - (rect.bottom - edge))
-          }
         }
 
         const onMoveGroup = (groupId, delta) => {
-          const ids = groups.map((group) => group.id)
-          const from = ids.indexOf(groupId)
-          const to = from + delta
-          if (from < 0 || to < 0 || to >= ids.length) return
-          const ordered = ids.slice()
-          ordered.splice(from, 1)
-          ordered.splice(to, 0, groupId)
-          act({ action: 'reorder_groups', ids: ordered }, 'group:reorder')
+          const from = groups.findIndex((group) => group.id === groupId)
+          if (from < 0) return
+          moveGroup(groupId, from + delta)
         }
 
-        const toggleSelectionMode = () => {
-          if (selectionMode) {
-            setSelectionMode(false)
-            setSelected(new Set())
-            return
-          }
-          setSelectionMode(true)
-        }
-
-        const selectVisibleSkills = () => setSelected(new Set(visibleSkills.map((skill) => skill.name)))
-
-        const invertSelection = () => setSelected((previous) => {
-          const next = new Set(previous)
-          for (const skill of visibleSkills) {
-            if (next.has(skill.name)) next.delete(skill.name)
-            else next.add(skill.name)
-          }
-          return next
-        })
-
-        const clearFilters = () => {
-          setQuery('')
-          setStatusFilter('all')
-        }
+        const onMoveTop = (groupId) => moveGroup(groupId, 0)
+        const onMoveBottom = (groupId) => moveGroup(groupId, groups.length - 1)
 
         const ui = {
           t,
@@ -1210,11 +1275,10 @@ window.__ModuleLoader__.load({
           groups,
           selected,
           selectionMode,
-          confirming: confirmGroup,
-          renaming,
           collapsed,
-          dragId,
-          dragOver,
+          renaming,
+          confirming: confirmGroup,
+          menuGroupId,
           onToggleSkill,
           onAssignSkill,
           onSelectSkill,
@@ -1225,12 +1289,12 @@ window.__ModuleLoader__.load({
           onSaveRename,
           onCancelRename,
           onDeleteGroup,
-          onMoveGroup,
           onCancelDelete: () => setConfirmGroup(''),
-          onDragStart,
-          onDragOver,
-          onDragEnd,
-          onDrop,
+          onMoveGroup,
+          onMoveTop,
+          onMoveBottom,
+          onOpenMenu: (groupId) => setMenuGroupId(groupId),
+          onCloseMenu: () => setMenuGroupId(null),
         }
 
         const sections = []
@@ -1259,47 +1323,182 @@ window.__ModuleLoader__.load({
           }))
         }
 
-        // Every rendered section, Ungrouped included: "collapse all" must keep
-        // working even when there are no named groups at all.
         const sectionKeys = (ungrouped.length > 0 ? ['ungrouped'] : []).concat(groups.map((group) => group.id))
         const allCollapsed = sectionKeys.length > 0 && sectionKeys.every((key) => collapsed.has(key))
 
-        const header = h('header', { style: S.header }, [
+        const header = h('header', { key: 'header', style: S.header }, [
           h('div', { key: 'titles', style: { minWidth: 0 } }, [
             h('h1', { key: 'title', style: S.title }, t('page.title')),
             h('p', { key: 'subtitle', style: S.subtitle }, t('page.subtitle')),
-            h('div', { key: 'stats', style: S.stats }, [
-              h(FilterChip, {
-                key: 'all',
-                label: t('page.filterAll'),
-                count: skills.length,
-                active: statusFilter === 'all',
-                onClick: () => setStatusFilter('all'),
-              }),
-              h(FilterChip, {
-                key: 'on',
-                label: t('page.filterOn'),
-                count: skills.filter((skill) => skill.enabled === true).length,
-                active: statusFilter === 'on',
-                onClick: () => setStatusFilter('on'),
-              }),
-              h(FilterChip, {
-                key: 'off',
-                label: t('page.filterOff'),
-                count: skills.filter((skill) => skill.enabled !== true).length,
-                active: statusFilter === 'off',
-                onClick: () => setStatusFilter('off'),
-              }),
-            ]),
           ]),
           h('button', {
             key: 'refresh',
             type: 'button',
-            style: Object.assign({}, S.button, { opacity: status === 'loading' || pending !== '' ? 0.6 : 1 }),
+            style: S.button,
             disabled: status === 'loading' || pending !== '',
             onClick: () => load(),
           }, t('page.refresh')),
         ])
+
+        const filters = h('div', { key: 'filters', style: S.filters }, [
+          h('input', {
+            key: 'search',
+            type: 'search',
+            value: query,
+            placeholder: t('page.searchPlaceholder'),
+            'aria-label': t('page.searchPlaceholder'),
+            style: S.search,
+            onChange: (event) => setQuery(event.target.value),
+          }),
+          h(FilterChip, {
+            key: 'all',
+            label: t('page.filterAll'),
+            count: skills.length,
+            active: statusFilter === 'all',
+            onClick: () => setStatusFilter('all'),
+          }),
+          h(FilterChip, {
+            key: 'on',
+            label: t('page.filterOn'),
+            count: skills.filter((skill) => skill.enabled === true).length,
+            active: statusFilter === 'on',
+            onClick: () => setStatusFilter('on'),
+          }),
+          h(FilterChip, {
+            key: 'off',
+            label: t('page.filterOff'),
+            count: skills.filter((skill) => skill.enabled !== true).length,
+            active: statusFilter === 'off',
+            onClick: () => setStatusFilter('off'),
+          }),
+          hasFilter
+            ? h('button', {
+              key: 'clearFilters',
+              type: 'button',
+              style: S.buttonQuiet,
+              onClick: clearFilters,
+            }, t('page.clearFilters'))
+            : null,
+        ])
+
+        const selectionToolbar = selectionMode
+          ? h('div', { key: 'selection-toolbar', style: S.toolbar }, [
+            h('span', { key: 'count', style: { fontSize: 12, fontWeight: 600, color: 'var(--dsw-alias-brand-primary)' } },
+              `${t('page.selected')} ${selected.size} / ${visibleSkills.length}`),
+            h('button', {
+              key: 'all',
+              type: 'button',
+              style: S.button,
+              disabled: pending !== '',
+              onClick: selectVisibleSkills,
+            }, t('page.selectAll')),
+            h('button', {
+              key: 'invert',
+              type: 'button',
+              style: S.button,
+              disabled: pending !== '',
+              onClick: invertSelection,
+            }, t('page.invert')),
+            h('button', {
+              key: 'clear',
+              type: 'button',
+              style: S.button,
+              disabled: selected.size === 0,
+              onClick: () => setSelected(new Set()),
+            }, t('page.batchClear')),
+            h('span', { key: 'divider', style: S.divider }),
+            h('button', {
+              key: 'enable',
+              type: 'button',
+              style: S.button,
+              disabled: pending !== '' || selected.size === 0,
+              onClick: () => runBatch('enable'),
+            }, t('page.batchEnable')),
+            h('button', {
+              key: 'disable',
+              type: 'button',
+              style: S.button,
+              disabled: pending !== '' || selected.size === 0,
+              onClick: () => runBatch('disable'),
+            }, t('page.batchDisable')),
+            h('select', {
+              key: 'move',
+              value: '',
+              disabled: pending !== '' || selected.size === 0 || groups.length === 0,
+              'aria-label': t('page.batchMove'),
+              title: t('page.batchMove'),
+              style: S.select,
+              onChange: (event) => {
+                const groupId = event.target.value
+                if (groupId !== '') runBatch('assign', { group_id: groupId })
+              },
+            }, [h('option', { key: '', value: '' }, t('page.batchMove'))].concat(
+              groups.map((group) => h('option', { key: group.id, value: group.id }, group.name)),
+            )),
+            h('button', {
+              key: 'ungroup',
+              type: 'button',
+              style: S.button,
+              disabled: pending !== '' || selected.size === 0,
+              onClick: () => runBatch('ungroup'),
+            }, t('page.batchUngroup')),
+            h('span', { key: 'spacer', style: { flex: '1 1 auto' } }),
+            h('button', {
+              key: 'done',
+              type: 'button',
+              style: S.buttonPrimary,
+              onClick: toggleSelectionMode,
+            }, t('page.done')),
+          ])
+          : null
+
+        const normalToolbar = selectionMode
+          ? null
+          : h('div', { key: 'normal-toolbar', style: S.toolbar }, [
+            h('input', {
+              key: 'draft',
+              value: draftGroup,
+              placeholder: t('page.newGroup'),
+              'aria-label': t('page.newGroup'),
+              maxLength: 40,
+              style: S.input,
+              disabled: pending === 'group:create',
+              onChange: (event) => setDraftGroup(event.target.value),
+              onKeyDown: (event) => {
+                if (event.key === 'Enter') onCreateGroup()
+              },
+            }),
+            h('button', {
+              key: 'create',
+              type: 'button',
+              style: S.buttonPrimary,
+              disabled: draftGroup.trim() === '' || pending === 'group:create',
+              onClick: onCreateGroup,
+            }, t('page.addGroup')),
+            h('span', { key: 'spacer', style: { flex: '1 1 auto' } }),
+            h('button', {
+              key: 'batchMode',
+              type: 'button',
+              style: S.button,
+              disabled: skills.length === 0,
+              onClick: toggleSelectionMode,
+            }, t('page.batchMode')),
+            h('button', {
+              key: 'collapseAll',
+              type: 'button',
+              style: S.button,
+              disabled: sectionKeys.length === 0,
+              onClick: () => {
+                if (allCollapsed) {
+                  setCollapsed(new Set())
+                  return
+                }
+                const next = new Set()
+                for (const key of sectionKeys) next.add(key)
+                setCollapsed(next)
+              },
+            }, allCollapsed ? t('page.expandAll') : t('page.collapseAll')),
+          ])
 
         const notices = []
         if (error !== '') notices.push(h('div', { key: 'error', style: S.banner }, error))
@@ -1311,190 +1510,47 @@ window.__ModuleLoader__.load({
           notices.push(h('div', { key: 'noagent', style: S.notice }, t('page.noAgent')))
         }
 
-        const toolbar = h('div', { style: S.toolbar }, [
-          h('input', {
-            key: 'draft',
-            value: draftGroup,
-            placeholder: t('page.newGroup'),
-            'aria-label': t('page.newGroup'),
-            maxLength: 40,
-            style: S.input,
-            disabled: pending === 'group:create',
-            onChange: (event) => setDraftGroup(event.target.value),
-            onKeyDown: (event) => {
-              if (event.key === 'Enter') onCreateGroup()
-            },
-          }),
-          h('button', {
-            key: 'create',
-            type: 'button',
-            style: Object.assign({}, S.buttonPrimary, {
-              opacity: draftGroup.trim() === '' || pending === 'group:create' ? 0.6 : 1,
-            }),
-            disabled: draftGroup.trim() === '' || pending === 'group:create',
-            onClick: onCreateGroup,
-          }, t('page.addGroup')),
-          h('span', { key: 'spacer', style: { flex: '1 1 auto' } }),
-          h('button', {
-            key: 'batchMode',
-            type: 'button',
-            style: Object.assign({}, selectionMode ? S.buttonPrimary : S.button),
-            disabled: skills.length === 0,
-            'aria-pressed': selectionMode ? 'true' : 'false',
-            onClick: toggleSelectionMode,
-          }, selectionMode ? t('page.batchExit') : t('page.batchMode')),
-          h('button', {
-            key: 'collapseAll',
-            type: 'button',
-            style: S.button,
-            disabled: groups.length === 0 && ungrouped.length === 0,
-            onClick: () => {
-              if (allCollapsed) {
-                setCollapsed(new Set())
-                return
-              }
-              const next = new Set()
-              for (const group of groups) next.add(group.id)
-              if (ungrouped.length > 0) next.add('ungrouped')
-              setCollapsed(next)
-            },
-          }, allCollapsed ? t('page.expandAll') : t('page.collapseAll')),
-        ])
-
-        const filterRow = h('div', { style: S.filterRow }, [
-          h('input', {
-            key: 'search',
-            type: 'search',
-            value: query,
-            placeholder: t('page.searchPlaceholder'),
-            'aria-label': t('page.searchPlaceholder'),
-            style: S.search,
-            onChange: (event) => setQuery(event.target.value),
-          }),
-          hasFilter
-            ? h('button', {
-              key: 'clearFilters',
+        let body
+        if (status === 'loading' && data === null) {
+          body = [h('div', { key: 'loading', style: Object.assign({}, S.muted, { marginTop: 24 }) }, t('page.loading'))]
+        } else if (status === 'error' && data === null) {
+          body = [h('div', { key: 'failed', style: { marginTop: 20 } }, [
+            h('button', {
+              key: 'retry',
               type: 'button',
-              style: S.buttonQuiet,
+              style: S.button,
+              onClick: () => load(),
+            }, t('page.retry')),
+          ])]
+        } else if (skills.length === 0) {
+          body = [h('div', { key: 'empty', style: Object.assign({}, S.muted, { marginTop: 24 }) }, t('page.empty'))]
+        } else if (visibleSkills.length === 0) {
+          body = [h('div', {
+            key: 'nomatch',
+            style: { marginTop: 24, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
+          }, [
+            h('span', { key: 'text', style: S.muted }, t('page.noMatch')),
+            h('button', {
+              key: 'clear',
+              type: 'button',
+              style: S.button,
               onClick: clearFilters,
-            }, t('page.clearFilters'))
-            : null,
-          h('span', { key: 'spacer', style: { flex: '1 1 auto' } }),
-          hasFilter
-            ? h('span', { key: 'shown', style: S.muted }, `${t('page.visible')} ${visibleSkills.length} / ${skills.length}`)
-            : null,
-        ])
-
-        const batchBar = !selectionMode ? null : h('div', { style: S.batchBar }, [
-          h('span', { key: 'count', style: S.batchCount }, `${t('page.selected')} ${selected.size} · ${t('page.visible')} ${visibleSkills.length}`),
-          h('button', {
-            key: 'all',
-            type: 'button',
-            style: S.buttonQuiet,
-            disabled: pending !== '',
-            onClick: selectVisibleSkills,
-          }, t('page.selectAll')),
-          h('button', {
-            key: 'invert',
-            type: 'button',
-            style: S.buttonQuiet,
-            disabled: pending !== '',
-            onClick: invertSelection,
-          }, t('page.invert')),
-          h('button', {
-            key: 'clear',
-            type: 'button',
-            style: S.buttonQuiet,
-            disabled: selected.size === 0,
-            onClick: () => setSelected(new Set()),
-          }, t('page.batchClear')),
-          h('span', {
-            key: 'sep',
-            'aria-hidden': true,
-            style: { width: 1, height: 18, background: 'var(--dsw-alias-border-l1)', flex: '0 0 auto' },
-          }),
-          h('button', {
-            key: 'enable',
-            type: 'button',
-            style: S.button,
-            disabled: pending !== '' || selected.size === 0,
-            onClick: () => runBatch('enable'),
-          }, t('page.batchEnable')),
-          h('button', {
-            key: 'disable',
-            type: 'button',
-            style: S.button,
-            disabled: pending !== '' || selected.size === 0,
-            onClick: () => runBatch('disable'),
-          }, t('page.batchDisable')),
-          h('select', {
-            key: 'move',
-            value: '',
-            disabled: pending !== '' || selected.size === 0 || groups.length === 0,
-            'aria-label': t('page.batchMove'),
-            title: t('page.batchMove'),
-            style: S.select,
-            onChange: (event) => onBatchMove(event.target.value),
-          }, [h('option', { key: '', value: '' }, t('page.batchMove'))].concat(
-            groups.map((group) => h('option', { key: group.id, value: group.id }, group.name)),
-          )),
-          h('button', {
-            key: 'ungroup',
-            type: 'button',
-            style: S.button,
-            disabled: pending !== '' || selected.size === 0,
-            onClick: () => runBatch('ungroup'),
-          }, t('page.batchUngroup')),
-          h('span', { key: 'spacer', style: { flex: '1 1 auto' } }),
-          h('button', {
-            key: 'exit',
-            type: 'button',
-            style: S.buttonQuiet,
-            onClick: toggleSelectionMode,
-          }, t('page.batchExit')),
-        ])
-
-        const body = status === 'loading' && data === null
-          ? [h('div', { key: 'loading', style: Object.assign({}, S.muted, { marginTop: 24 }) }, t('page.loading'))]
-          : status === 'error' && data === null
-            ? [h('div', { key: 'failed', style: { marginTop: 20 } }, [
-              h('button', {
-                key: 'retry',
-                type: 'button',
-                style: S.button,
-                onClick: () => load(),
-              }, t('page.retry')),
-            ])]
-            : skills.length === 0
-              ? [h('div', { key: 'empty', style: Object.assign({}, S.muted, { marginTop: 24 }) }, t('page.empty'))]
-              : visibleSkills.length === 0
-                ? [h('div', {
-                  key: 'nomatch',
-                  style: { marginTop: 24, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
-                }, [
-                  h('span', { key: 'text', style: S.muted }, t('page.noMatch')),
-                  h('button', {
-                    key: 'clear',
-                    type: 'button',
-                    style: S.buttonQuiet,
-                    onClick: clearFilters,
-                  }, t('page.clearFilters')),
-                ])]
-                : sections
+            }, t('page.clearFilters')),
+          ])]
+        } else {
+          body = sections
+        }
 
         const footerText = typeof data?.statePath === 'string' && data.statePath !== ''
           ? `${t('page.footer')}  ${t('page.savedTo')}: ${data.statePath}`
           : t('page.footer')
-        const footer = h('div', { style: S.footer }, footerText)
+        const footer = h('div', { key: 'footer', style: S.footer }, footerText)
 
-        const children = [header, toolbar, filterRow].concat(notices, body, [footer])
-        if (batchBar !== null) children.push(batchBar)
-        return h('div', {
-          className: 'sm-panel',
-          style: S.page,
-          ref: pageRef,
-          onDragOver: onPageDragOver,
-        }, [
+        const children = [header, filters, selectionToolbar, normalToolbar]
+          .filter((node) => node !== null)
+          .concat(notices, body, [footer])
+
+        return h('div', { className: 'sm-panel', style: S.page }, [
           h('style', { key: 'sm-style' }, STYLE_TEXT),
           h('div', { key: 'inner', style: S.inner }, children),
         ])

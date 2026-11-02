@@ -4,6 +4,23 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-11-02
+
+### Changed
+
+- **Panel layout rebuilt around one vertical rhythm**: header, filters, and a
+  single action row, then the groups. Group actions moved behind one `⋯` menu
+  (move up / down / to top / to bottom, rename, delete) instead of four
+  always-visible buttons, and the whole group header toggles collapse.
+- **Batch mode swaps the action row** instead of floating a bar over the list:
+  select all / invert / clear, enable / disable, move / remove, and Done all
+  sit in the normal row, so nothing overlaps the content.
+- **Drag-and-drop reordering was removed.** Groups move with `↑` / `↓` and the
+  menu, so ordering never fights the scroll position.
+- Rows are calmer: one-line description with a full-text tooltip, a quiet group
+  picker that outlines on hover, and the status pill on the right.
+- Deleting a group asks inline under its own header, not in the group row.
+
 ## [1.4.0] - 2026-11-02
 
 ### Added

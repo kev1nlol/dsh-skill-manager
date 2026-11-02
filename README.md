@@ -17,10 +17,10 @@ Harness 的技能来自很多地方（内置包、`~/.dsh/skills`、项目目录
 ## 功能
 
 - **侧栏入口**：左栏出现 `SKILL 管理` 图标（order 15），点开是完整的主面板。
-- **分组真好管**：每个分组可**重命名**；用标题右侧的 `↑` / `↓` 按钮排序，或拖住左侧 `⠿` 手柄拖动（拖到面板上下边缘会自动滚动），顺序会持久化。
-- **搜索与筛选**：按名称 / 描述 / 来源搜索；顶部计数是可点的筛选气泡（全部 / 已启用 / 已关闭），筛选后分组标题显示「可见/总数」，无匹配的分组自动收起。
-- **批量操作**：点工具栏「批量管理」进入批量模式，勾选行或整节；底部吸附一条操作条：全选 / 反选 / 清空 / 批量启用 / 批量关闭 / 移到分组 / 移出分组 / 退出。全选与反选只作用于当前可见的技能。
-- **折叠 / 展开**：每个分组标题都能折叠，另有「全部折叠 / 全部展开」；折叠状态记在浏览器本地。
+- **分组管理**：点分组标题即可折叠 / 展开；标题右侧 `↑` / `↓` 调整顺序，「⋯」菜单里还有置顶 / 置底 / 重命名 / 删除分组，顺序会持久化。
+- **搜索与筛选**：按名称 / 描述 / 来源搜索；顶部计数是可点的筛选气泡（全部 / 已启用 / 已关闭），筛选时分组标题显示「可见/总数」。
+- **批量操作**：点「批量管理」后工具栏整行切换为批量操作条（全选 / 反选 / 清空 · 启用 / 关闭 / 移到分组 / 移出分组 · 完成），不做悬浮层；全选与反选只作用于当前可见技能。
+- **折叠 / 展开**：每个分组都能整体折叠，工具栏有「全部折叠 / 全部展开」，状态记在浏览器本地。
 - **分组只是整理**：分组名存在 Harness 配置目录下的 JSON 里，不参与发现、索引、加载。删除分组只删标签——组内技能回到「未分组」，技能本身不受任何影响。
 - **开关是真的**：关闭某个技能时，插件会在每个活动 Agent 自己的作用域里注册一个遮蔽 provider，对该名字报 `invocation: { modelInvocable: false, userInvocable: false }`。所有按 Agent 解析技能的消费方因此不再展示、不再加载它；下一个 `agent/pre-step` 会追加一份替换目录，模型立刻知道变化。
 - **不碰技能文件**：不编辑、不移动、不删除 `SKILL.md`；重新打开只是撤掉遮蔽。
@@ -64,13 +64,11 @@ plugin_manager install_bundle → D:\path\to\dsh-skill-manager
 1. 从侧栏打开面板；
 2. 顶部输入框建分组（例如 `个人安装`、`官方内置`）；
 3. 用每行右侧的下拉把技能移入分组，或移回「未分组」；
-4. 用每行最右侧的开关停止 / 恢复索引，徽标与筛选计数立刻更新；
+4. 用每行最右侧的开关停止 / 恢复索引，筛选计数立刻更新；
 5. 用搜索框按名称 / 描述 / 来源过滤，或点顶部计数气泡（全部 / 已启用 / 已关闭）只看某一类；
-6. 点工具栏「批量管理」进入批量模式：勾选行或整节（点行文字也能选中），底部吸附条提供全选 / 反选 / 清空 / 启用 / 关闭 / 移到分组 / 移出分组 / 退出；
-7. 分组标题右侧可「重命名」「删除分组」；删除只删分组（悬停有说明）；
-8. 点标题前的 `▾` / `▸` 折叠或展开该分组，「全部折叠 / 全部展开」在工具栏右侧；
-9. 分组排序：用标题右侧的 `↑` / `↓` 按钮，或拖动左侧 `⠿` 手柄（靠近面板上下边缘会自动滚动）；
-10. `Esc` 逐层退出：先取消重命名，再清空搜索，再退出批量模式。
+6. 点分组标题（或前面的 `▾` / `▸`）折叠、展开；`↑` / `↓` 调整分组顺序，`⋯` 菜单可置顶 / 置底 / 重命名 / 删除；
+7. 点「批量管理」进入批量模式：勾选行或整节（点行文字也能选中），工具栏变成批量操作条，选完后点「完成」退出；
+8. `Esc` 逐层退出：先关菜单，再取消重命名，再清空搜索，最后退出批量模式。
 
 每次切换都会让模型的下一步拿到新的技能目录，被关闭的技能会从 `<available_skills>` 和该会话的 `/` 菜单里消失。
 
@@ -135,7 +133,7 @@ plugin_manager install_bundle → D:\path\to\dsh-skill-manager
 - **面板不删技能**：要移除技能请去来源处删（`~/.dsh/skills/<name>/`、安装它的 bundle 等）。
 - **冷会话**：没有活动 Agent 的会话，`/` 菜单可能走 preset 作用域的注册表，此时按 Agent 的遮蔽不生效；发一条消息激活 Agent 后，下一次取数即按开关过滤。
 - **同源请求**：面板调用页面同源的 `/skill-manager/...`。已在 http 服务的 Web GUI 中验证；从 `file://` 加载界面的外壳可能解析不到这些路由。
-- **技能不能拖拽归组**：分组本身可以拖 `⠿` 手柄排序；技能归组用行内下拉框或批量条。
+- **没有拖拽**：分组顺序用 `↑` / `↓` 和 `⋯` 菜单调整；技能归组用行内下拉或批量操作。
 - **目录完整性**：某个 provider 发现不完整时，面板会提示，并展示最近一次可用结果。
 
 ## 开发
@@ -181,11 +179,11 @@ Harness skills come from many places (bundled packages, `~/.dsh/skills`, project
 ## Features
 
 - **Sidebar entry.** A `SKILL 管理` / `SKILL Manager` icon in the left rail (order 15) opens a full main panel.
-- **Groups that are easy to manage.** Rename a group in place, then reorder groups with the `↑` / `↓` buttons or by dragging the `⠿` handle (dragging near the top or bottom edge auto-scrolls the panel); the order is persisted.
-- **Search and filters.** Filter by name, description, or source with the search box, or click the count chips (All / Enabled / Disabled); group headers show `visible/total` and groups with no matches hide.
-- **Batch operations.** Turn on *Batch actions* in the toolbar, tick rows or whole sections, and use the bar pinned to the bottom: select all, invert, clear, enable, disable, move into a group, remove from a group, exit. Select-all and invert only touch the visible rows.
-- **Keyboard escape.** `Esc` backs out one layer: a rename, then the search, then batch mode.
+- **Groups that are easy to manage.** Click a group header (or its chevron) to collapse or expand; `↑` / `↓` reorder groups, and the `⋯` menu holds move-to-top, move-to-bottom, rename, and delete. The order is persisted.
+- **Search and filters.** Filter by name, description, or source with the search box, or click the count chips (All / Enabled / Disabled); while filtering, group headers show visible/total.
+- **Batch operations.** *Batch actions* swaps the action row into selection controls: select all / invert / clear, enable / disable, move / remove, and Done. There is no floating overlay, and select-all and invert touch only the visible rows.
 - **Collapse and expand.** Every group header collapses, plus a global collapse/expand control; the state is remembered in the browser.
+- **Keyboard escape.** `Esc` backs out one layer: the menu, a rename, the search, then batch mode.
 - **Groups are pure bookkeeping.** Names live in a JSON file next to your Harness home and never influence discovery, indexing, or loading. Deleting a group only drops the label: its members move back to *Ungrouped*, and no skill is removed or modified.
 - **On/off is real.** Turning a skill off publishes a scope-local shadow provider on every live Agent that reports `invocation: { modelInvocable: false, userInvocable: false }` for that name. All consumers that resolve skills for an Agent therefore stop advertising and loading it, and the next `agent/pre-step` publishes a replacement catalog so the model learns about the change immediately.
 - **Never touches skill files.** No `SKILL.md` is edited, moved, or deleted. Turning a skill back on simply withdraws the shadow.
@@ -231,13 +229,11 @@ If you prefer editing the profile patch yourself, add the bundle row:
 1. Open the SKILL Manager panel from the sidebar.
 2. Create a group (for example `个人安装` or `Official`) with the input at the top.
 3. Use the group picker on any row to move that skill into a group, or back to *Ungrouped*.
-4. Use the on/off pill on the right of a row to stop or resume indexing that skill. The row badge and the filter counts update immediately.
-5. Filter with the search box, or click the count chips (All / Enabled / Disabled) to see one class only.
-6. Turn on *Batch actions* in the toolbar: tick rows or a whole section (clicking a row's text also toggles it), and the bar pinned to the bottom offers select all, invert, clear, enable, disable, move into a group, remove from a group, and exit.
-7. Rename or delete a group from its header; deleting only removes the group (hover for the explanation).
-8. Click `▾` / `▸` to collapse or expand a group, or use *Collapse all* / *Expand all* in the toolbar.
-9. Reorder groups with the `↑` / `↓` buttons or by dragging the `⠿` handle; dragging near the top or bottom edge auto-scrolls the panel.
-10. `Esc` backs out one layer: a rename, then the search, then batch mode.
+4. Use the on/off pill on the right of a row to stop or resume indexing that skill; the filter counts update immediately.
+5. Filter with the search box, or click the count chips (All / Enabled / Disabled).
+6. Click a group header (or its `▾` / `▸`) to collapse or expand; `↑` / `↓` reorder groups, and the `⋯` menu offers move-to-top, move-to-bottom, rename, and delete.
+7. Turn on *Batch actions*: tick rows or a whole section (clicking a row's text also toggles it); the action row becomes the batch controls, and *Done* exits.
+8. `Esc` backs out one layer: the menu, a rename, the search, then batch mode.
 
 The panel starts the model's next step with a fresh skill catalog whenever you toggle something, so a disabled skill disappears from the model's `<available_skills>` list and from the `/` menu for that session.
 
@@ -302,7 +298,7 @@ The same operations are available to the model as the `skill_manager` tool with 
 - **Skill files are read-only here.** The panel deliberately offers no "delete skill"; remove the skill at its source (`~/.dsh/skills/<name>/`, the installing bundle, and so on).
 - **Cold sessions.** The `/` skill menu of a session that has no live Agent can be served from the preset-scope registry, where the per-Agent shadow does not apply. Sending one message activates the Agent and the filter applies from the next fetch.
 - **Same-origin fetch.** The panel calls `/skill-manager/...` on the page's own origin. It is verified in the Web GUI served over http; a shell that loads the UI from `file://` may not resolve these routes.
-- **No skill drag and drop.** Group rows are reordered by dragging their `⠿` handle; to regroup a skill use its row picker or the batch bar.
+- **No drag and drop.** Groups are ordered with `↑` / `↓` and the `⋯` menu; regroup a skill with its row picker or the batch controls.
 - **Catalog completeness.** If a provider's discovery is incomplete, the panel says so and shows the last usable view.
 
 ## Development
