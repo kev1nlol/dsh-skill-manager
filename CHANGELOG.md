@@ -4,6 +4,24 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-11-02
+
+### Added
+
+- **Search and status filters.** A search box matches skill names, descriptions,
+  sources, and providers; the header counts became chips that filter by All,
+  Enabled, or Disabled. Group headers show `visible/total` while a filter is
+  active, and groups with no matches hide.
+- **Invert selection** in the batch bar. Select-all and invert act on the
+  visible rows only, and narrowing a filter drops hidden skills from the
+  selection so a batch action can never touch an invisible skill.
+- **Escape backs out one layer**: a rename, then the search, then batch mode.
+
+### Changed
+
+- Rows highlight on hover, and buttons, inputs, and selects show a visible
+  keyboard focus ring (component-local styles, removed with the panel).
+
 ## [1.3.0] - 2026-11-02
 
 ### Changed
