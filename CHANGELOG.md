@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-11-02
+
+### Changed
+
+- **Batch mode is explicit.** A toolbar toggle turns selection on; checkboxes
+  appear only in that mode and the action bar is pinned to the bottom of the
+  panel (select all, clear, enable, disable, move, remove, exit). Clicking a
+  row's text also toggles it, and section actions are hidden while the mode is
+  on.
+- **Sortable without dragging.** Every group header gained `↑` / `↓` buttons,
+  and dragging a group near the top or bottom edge now auto-scrolls the panel,
+  so reordering works on any window height. Header controls wrap instead of
+  overflowing.
+
 ## [1.2.1] - 2026-11-02
 
 ### Fixed

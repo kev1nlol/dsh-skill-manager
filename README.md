@@ -17,8 +17,8 @@ Harness 的技能来自很多地方（内置包、`~/.dsh/skills`、项目目录
 ## 功能
 
 - **侧栏入口**：左栏出现 `SKILL 管理` 图标（order 15），点开是完整的主面板。
-- **分组真好管**：每个分组可**重命名**；拖住分组左侧的 `⠿` 手柄即可调整分组顺序，顺序会持久化。
-- **批量操作**：勾选技能（每节还支持全选）后，可批量启用 / 批量关闭 / 批量移入分组 / 批量移出分组。
+- **分组真好管**：每个分组可**重命名**；用标题右侧的 `↑` / `↓` 按钮排序，或拖住左侧 `⠿` 手柄拖动（拖到面板上下边缘会自动滚动），顺序会持久化。
+- **批量操作**：点工具栏「批量管理」进入批量模式，勾选行或整节；底部吸附一条操作条：全选 / 清空 / 批量启用 / 批量关闭 / 移到分组 / 移出分组 / 退出。
 - **折叠 / 展开**：每个分组标题都能折叠，另有「全部折叠 / 全部展开」；折叠状态记在浏览器本地。
 - **分组只是整理**：分组名存在 Harness 配置目录下的 JSON 里，不参与发现、索引、加载。删除分组只删标签——组内技能回到「未分组」，技能本身不受任何影响。
 - **开关是真的**：关闭某个技能时，插件会在每个活动 Agent 自己的作用域里注册一个遮蔽 provider，对该名字报 `invocation: { modelInvocable: false, userInvocable: false }`。所有按 Agent 解析技能的消费方因此不再展示、不再加载它；下一个 `agent/pre-step` 会追加一份替换目录，模型立刻知道变化。
@@ -64,10 +64,10 @@ plugin_manager install_bundle → D:\path\to\dsh-skill-manager
 2. 顶部输入框建分组（例如 `个人安装`、`官方内置`）；
 3. 用每行右侧的下拉把技能移入分组，或移回「未分组」；
 4. 用每行最右侧的开关停止 / 恢复索引，徽标与顶部计数立刻更新；
-5. 勾选多个技能（或点分组标题前的复选框整节选择），顶部出现批量条：启用 / 关闭 / 移到分组 / 移出分组；
+5. 点工具栏「批量管理」进入批量模式：勾选行或整节复选框（点行本身的文字区域也能勾选），底部吸附条提供全选 / 清空 / 启用 / 关闭 / 移到分组 / 移出分组 / 退出；
 6. 分组标题右侧可「重命名」「删除分组」；删除只删分组（悬停有说明）；
 7. 点标题前的 `▾` / `▸` 折叠或展开该分组，「全部折叠 / 全部展开」在工具栏右侧；
-8. 拖动分组左侧的 `⠿` 手柄调整分组顺序。
+8. 分组排序：用标题右侧的 `↑` / `↓` 按钮，或拖动左侧 `⠿` 手柄（靠近面板上下边缘会自动滚动）。
 
 每次切换都会让模型的下一步拿到新的技能目录，被关闭的技能会从 `<available_skills>` 和该会话的 `/` 菜单里消失。
 
@@ -178,8 +178,8 @@ Harness skills come from many places (bundled packages, `~/.dsh/skills`, project
 ## Features
 
 - **Sidebar entry.** A `SKILL 管理` / `SKILL Manager` icon in the left rail (order 15) opens a full main panel.
-- **Groups that are easy to manage.** Rename a group in place, and drag the `⠿` handle on its left to reorder groups; the order is persisted.
-- **Batch operations.** Tick skills (or select a whole section) to enable, disable, move into a group, or remove from a group in one go.
+- **Groups that are easy to manage.** Rename a group in place, then reorder groups with the `↑` / `↓` buttons or by dragging the `⠿` handle (dragging near the top or bottom edge auto-scrolls the panel); the order is persisted.
+- **Batch operations.** Turn on *Batch actions* in the toolbar, tick rows or whole sections, and use the bar pinned to the bottom: select all, clear, enable, disable, move into a group, remove from a group, exit.
 - **Collapse and expand.** Every group header collapses, plus a global collapse/expand control; the state is remembered in the browser.
 - **Groups are pure bookkeeping.** Names live in a JSON file next to your Harness home and never influence discovery, indexing, or loading. Deleting a group only drops the label: its members move back to *Ungrouped*, and no skill is removed or modified.
 - **On/off is real.** Turning a skill off publishes a scope-local shadow provider on every live Agent that reports `invocation: { modelInvocable: false, userInvocable: false }` for that name. All consumers that resolve skills for an Agent therefore stop advertising and loading it, and the next `agent/pre-step` publishes a replacement catalog so the model learns about the change immediately.
@@ -227,10 +227,10 @@ If you prefer editing the profile patch yourself, add the bundle row:
 2. Create a group (for example `个人安装` or `Official`) with the input at the top.
 3. Use the group picker on any row to move that skill into a group, or back to *Ungrouped*.
 4. Use the on/off pill on the right of a row to stop or resume indexing that skill. The row badge and the counters at the top update immediately.
-5. Tick several skills (or the checkbox in a group header to select the whole section) and the batch bar appears: enable, disable, move to a group, or remove from a group.
+5. Turn on *Batch actions* in the toolbar: tick rows or a whole section (clicking a row's text also toggles it), and the bar pinned to the bottom offers select all, clear, enable, disable, move into a group, remove from a group, and exit.
 6. Rename or delete a group from its header; deleting only removes the group (hover for the explanation).
 7. Click `▾` / `▸` to collapse or expand a group, or use *Collapse all* / *Expand all* in the toolbar.
-8. Drag the `⠿` handle on a group header to reorder groups.
+8. Reorder groups with the `↑` / `↓` buttons or by dragging the `⠿` handle; dragging near the top or bottom edge auto-scrolls the panel.
 
 The panel starts the model's next step with a fresh skill catalog whenever you toggle something, so a disabled skill disappears from the model's `<available_skills>` list and from the `/` menu for that session.
 

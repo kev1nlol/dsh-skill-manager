@@ -46,7 +46,12 @@ window.__ModuleLoader__.load({
       'page.batchDisable': '批量关闭',
       'page.batchMove': '移动到分组…',
       'page.batchUngroup': '移出分组',
-      'page.batchClear': '取消选择',
+      'page.batchClear': '清空',
+      'page.batchMode': '批量管理',
+      'page.batchExit': '退出批量',
+      'page.selectAll': '全选',
+      'page.moveUp': '上移',
+      'page.moveDown': '下移',
       'page.collapse': '折叠',
       'page.expand': '展开',
       'page.collapseAll': '全部折叠',
@@ -96,7 +101,12 @@ window.__ModuleLoader__.load({
       'page.batchDisable': 'Disable selected',
       'page.batchMove': 'Move to group…',
       'page.batchUngroup': 'Remove from group',
-      'page.batchClear': 'Clear selection',
+      'page.batchClear': 'Clear',
+      'page.batchMode': 'Batch actions',
+      'page.batchExit': 'Exit batch',
+      'page.selectAll': 'Select all',
+      'page.moveUp': 'Move up',
+      'page.moveDown': 'Move down',
       'page.collapse': 'Collapse',
       'page.expand': 'Expand',
       'page.collapseAll': 'Collapse all',
@@ -241,17 +251,37 @@ window.__ModuleLoader__.load({
         lineHeight: '18px',
       },
       batchBar: {
+        position: 'sticky',
+        bottom: 0,
+        zIndex: 3,
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
         gap: 8,
-        marginTop: 16,
+        marginTop: 18,
         padding: '10px 12px',
-        borderRadius: 8,
+        borderRadius: 10,
         border: '1px solid var(--dsw-alias-brand-primary)',
-        background: 'var(--dsw-alias-bg-layer-1)',
+        background: 'var(--dsw-alias-bg-overlay)',
       },
       batchCount: { fontSize: 12, fontWeight: 600, color: 'var(--dsw-alias-brand-primary)' },
+      iconButton: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 22,
+        height: 22,
+        padding: 0,
+        borderRadius: 6,
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-secondary)',
+        font: 'inherit',
+        fontSize: 11,
+        lineHeight: '16px',
+        cursor: 'pointer',
+        flex: '0 0 auto',
+      },
       section: { marginTop: 22 },
       sectionHead: {
         display: 'flex',
@@ -259,6 +289,7 @@ window.__ModuleLoader__.load({
         gap: 8,
         padding: '4px 2px 8px',
         borderRadius: 8,
+        flexWrap: 'wrap',
       },
       sectionHeadDrop: {
         boxShadow: 'inset 0 2px 0 0 var(--dsw-alias-brand-primary)',
@@ -502,22 +533,48 @@ window.__ModuleLoader__.load({
       if (skill.available === false) {
         title.push(h(Badge, { key: 'missing', warn: true }, t('page.missing')))
       }
-      const children = [
-        h('input', {
+      const selected = ui.selected.has(skill.name)
+      const children = []
+      if (ui.selectionMode) {
+        children.push(h('input', {
           key: 'check',
           type: 'checkbox',
-          checked: ui.selected.has(skill.name),
+          checked: selected,
           disabled: busy,
           'aria-label': t('page.selectOne'),
           onChange: () => ui.onSelectSkill(skill.name),
           style: S.checkbox,
-        }),
-        h('div', { key: 'main', style: S.rowMain }, [
-          h('div', { key: 'title', style: S.rowTitle }, title),
-          typeof skill.description === 'string' && skill.description !== ''
-            ? h('div', { key: 'description', style: S.description }, skill.description)
-            : null,
-        ]),
+        }))
+      }
+      children.push(h('div', {
+        key: 'main',
+        style: ui.selectionMode
+          ? Object.assign({}, S.rowMain, {
+            cursor: 'pointer',
+            borderRadius: 6,
+            padding: '2px 6px',
+            margin: '-2px -6px',
+            background: selected ? 'var(--dsw-alias-bg-layer-2)' : 'transparent',
+          })
+          : S.rowMain,
+        onClick: ui.selectionMode ? () => ui.onSelectSkill(skill.name) : undefined,
+        onKeyDown: ui.selectionMode
+          ? (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return
+            event.preventDefault()
+            ui.onSelectSkill(skill.name)
+          }
+          : undefined,
+        role: ui.selectionMode ? 'button' : undefined,
+        tabIndex: ui.selectionMode ? 0 : undefined,
+        'aria-pressed': ui.selectionMode ? (selected ? 'true' : 'false') : undefined,
+      }, [
+        h('div', { key: 'title', style: S.rowTitle }, title),
+        typeof skill.description === 'string' && skill.description !== ''
+          ? h('div', { key: 'description', style: S.description }, skill.description)
+          : null,
+      ]))
+      children.push(
         h('select', {
           key: 'group',
           value: typeof skill.groupId === 'string' ? skill.groupId : '',
@@ -536,7 +593,7 @@ window.__ModuleLoader__.load({
           disabled: busy,
           onClick: () => ui.onToggleSkill(skill),
         }),
-      ]
+      )
       return h('div', { style: props.first === true ? S.row : Object.assign({}, S.row, S.rowDivider) }, children)
     }
 
@@ -554,22 +611,7 @@ window.__ModuleLoader__.load({
       const allSelected = skills.length > 0 && skills.every((skill) => ui.selected.has(skill.name))
 
       const head = []
-      if (group !== null) {
-        head.push(h('span', {
-          key: 'handle',
-          draggable: true,
-          title: t('page.dragHint'),
-          'aria-label': t('page.dragHint'),
-          onDragStart: (event) => {
-            event.dataTransfer.effectAllowed = 'move'
-            event.dataTransfer.setData('text/plain', group.id)
-            ui.onDragStart(group.id)
-          },
-          onDragEnd: () => ui.onDragEnd(),
-          style: S.handle,
-        }, '⠿'))
-      }
-      head.push(h('button', {
+      const chevron = h('button', {
         key: 'chevron',
         type: 'button',
         'aria-expanded': collapsed ? 'false' : 'true',
@@ -577,72 +619,116 @@ window.__ModuleLoader__.load({
         title: collapsed ? t('page.expand') : t('page.collapse'),
         onClick: () => ui.onToggleCollapse(sectionKey),
         style: S.chevron,
-      }, collapsed ? '▸' : '▾'))
-      head.push(h('input', {
-        key: 'selectSect',
-        type: 'checkbox',
-        checked: allSelected,
-        disabled: skills.length === 0 || ui.pending !== '',
-        'aria-label': t('page.selectSection'),
-        onChange: () => ui.onSelectSection(sectionKey),
-        style: S.checkbox,
-      }))
+      }, collapsed ? '▸' : '▾')
 
-      if (renaming) {
+      if (ui.selectionMode) {
+        // Batch mode keeps the header to what selection needs: collapse,
+        // section checkbox, and the label. Row actions live in the sticky bar.
+        head.push(chevron)
         head.push(h('input', {
-          key: 'rename',
-          value: ui.renaming.draft,
-          autoFocus: true,
-          maxLength: 40,
-          placeholder: t('page.renamePlaceholder'),
-          'aria-label': t('page.renamePlaceholder'),
-          onChange: (event) => ui.onRenameDraft(event.target.value),
-          onKeyDown: (event) => {
-            if (event.key === 'Enter') ui.onSaveRename()
-            else if (event.key === 'Escape') ui.onCancelRename()
-          },
-          style: S.renameInput,
+          key: 'selectSect',
+          type: 'checkbox',
+          checked: allSelected,
+          disabled: skills.length === 0 || ui.pending !== '',
+          'aria-label': t('page.selectSection'),
+          onChange: () => ui.onSelectSection(sectionKey),
+          style: S.checkbox,
         }))
-        head.push(h('button', {
-          key: 'renameSave',
-          type: 'button',
-          style: S.buttonQuiet,
-          onClick: () => ui.onSaveRename(),
-        }, t('page.renameSave')))
-        head.push(h('button', {
-          key: 'renameCancel',
-          type: 'button',
-          style: S.buttonQuiet,
-          onClick: () => ui.onCancelRename(),
-        }, t('page.renameCancel')))
-      } else {
         head.push(h('span', { key: 'title', style: S.sectionTitle }, group === null ? t('page.ungrouped') : group.name))
-        head.push(h('span', { key: 'count', style: S.sectionCount }, String(skills.length)))
+        head.push(h('span', { key: 'count', style: S.sectionCount }, `${skills.length}`))
         head.push(h('span', { key: 'spacer', style: { flex: '1 1 auto' } }))
+      } else {
         if (group !== null) {
-          if (confirming) {
-            head.push(h('span', { key: 'hint', style: S.sectionHint }, t('page.deleteHint')))
+          head.push(h('span', {
+            key: 'handle',
+            draggable: true,
+            title: t('page.dragHint'),
+            'aria-label': t('page.dragHint'),
+            onDragStart: (event) => {
+              event.dataTransfer.effectAllowed = 'move'
+              event.dataTransfer.setData('text/plain', group.id)
+              ui.onDragStart(group.id)
+            },
+            onDragEnd: () => ui.onDragEnd(),
+            style: S.handle,
+          }, '⠿'))
+        }
+        head.push(chevron)
+
+        if (renaming) {
+          head.push(h('input', {
+            key: 'rename',
+            value: ui.renaming.draft,
+            autoFocus: true,
+            maxLength: 40,
+            placeholder: t('page.renamePlaceholder'),
+            'aria-label': t('page.renamePlaceholder'),
+            onChange: (event) => ui.onRenameDraft(event.target.value),
+            onKeyDown: (event) => {
+              if (event.key === 'Enter') ui.onSaveRename()
+              else if (event.key === 'Escape') ui.onCancelRename()
+            },
+            style: S.renameInput,
+          }))
+          head.push(h('button', {
+            key: 'renameSave',
+            type: 'button',
+            style: S.buttonQuiet,
+            onClick: () => ui.onSaveRename(),
+          }, t('page.renameSave')))
+          head.push(h('button', {
+            key: 'renameCancel',
+            type: 'button',
+            style: S.buttonQuiet,
+            onClick: () => ui.onCancelRename(),
+          }, t('page.renameCancel')))
+        } else {
+          head.push(h('span', { key: 'title', style: S.sectionTitle }, group === null ? t('page.ungrouped') : group.name))
+          head.push(h('span', { key: 'count', style: S.sectionCount }, String(skills.length)))
+          head.push(h('span', { key: 'spacer', style: { flex: '1 1 auto' } }))
+          if (group !== null) {
+            if (confirming) {
+              head.push(h('span', { key: 'hint', style: S.sectionHint }, t('page.deleteHint')))
+              head.push(h('button', {
+                key: 'cancelDelete',
+                type: 'button',
+                style: S.buttonQuiet,
+                onClick: () => ui.onCancelDelete(),
+              }, t('page.cancel')))
+            }
             head.push(h('button', {
-              key: 'cancelDelete',
+              key: 'up',
+              type: 'button',
+              style: S.iconButton,
+              title: t('page.moveUp'),
+              'aria-label': t('page.moveUp'),
+              disabled: ui.pending !== '' || props.index === 0,
+              onClick: () => ui.onMoveGroup(group.id, -1),
+            }, '↑'))
+            head.push(h('button', {
+              key: 'down',
+              type: 'button',
+              style: S.iconButton,
+              title: t('page.moveDown'),
+              'aria-label': t('page.moveDown'),
+              disabled: ui.pending !== '' || props.index === props.groupCount - 1,
+              onClick: () => ui.onMoveGroup(group.id, 1),
+            }, '↓'))
+            head.push(h('button', {
+              key: 'renameBtn',
               type: 'button',
               style: S.buttonQuiet,
-              onClick: () => ui.onCancelDelete(),
-            }, t('page.cancel')))
+              title: t('page.rename'),
+              onClick: () => ui.onStartRename(group),
+            }, t('page.rename')))
+            head.push(h('button', {
+              key: 'delete',
+              type: 'button',
+              style: S.buttonQuiet,
+              title: t('page.deleteHint'),
+              onClick: () => ui.onDeleteGroup(group, confirming),
+            }, confirming ? t('page.confirmDeleteGroup') : t('page.deleteGroup')))
           }
-          head.push(h('button', {
-            key: 'renameBtn',
-            type: 'button',
-            style: S.buttonQuiet,
-            title: t('page.rename'),
-            onClick: () => ui.onStartRename(group),
-          }, t('page.rename')))
-          head.push(h('button', {
-            key: 'delete',
-            type: 'button',
-            style: S.buttonQuiet,
-            title: t('page.deleteHint'),
-            onClick: () => ui.onDeleteGroup(group, confirming),
-          }, confirming ? t('page.confirmDeleteGroup') : t('page.deleteGroup')))
         }
       }
 
@@ -701,8 +787,10 @@ window.__ModuleLoader__.load({
         const [selected, setSelected] = React.useState(() => new Set())
         const [dragId, setDragId] = React.useState(null)
         const [dragOver, setDragOver] = React.useState(null)
+        const [selectionMode, setSelectionMode] = React.useState(false)
         const alive = React.useRef(true)
         const dragging = React.useRef(null)
+        const pageRef = React.useRef(null)
 
         React.useEffect(() => () => {
           alive.current = false
@@ -922,11 +1010,51 @@ window.__ModuleLoader__.load({
           act({ action: 'reorder_groups', ids: ordered }, 'group:reorder')
         }
 
+        // A native HTML5 drag suppresses wheel scrolling, so scrolling while
+        // dragging has to be driven explicitly: near either edge of the panel,
+        // every dragover event nudges scrollTop in that direction.
+        const onPageDragOver = (event) => {
+          if (dragging.current === null) return
+          const node = pageRef.current
+          if (node === null) return
+          const rect = node.getBoundingClientRect()
+          const edge = 72
+          const step = (distance) => Math.min(42, 6 + Math.ceil(distance / 3))
+          if (event.clientY < rect.top + edge) {
+            node.scrollTop -= step(rect.top + edge - event.clientY)
+          } else if (event.clientY > rect.bottom - edge) {
+            node.scrollTop += step(event.clientY - (rect.bottom - edge))
+          }
+        }
+
+        const onMoveGroup = (groupId, delta) => {
+          const ids = groups.map((group) => group.id)
+          const from = ids.indexOf(groupId)
+          const to = from + delta
+          if (from < 0 || to < 0 || to >= ids.length) return
+          const ordered = ids.slice()
+          ordered.splice(from, 1)
+          ordered.splice(to, 0, groupId)
+          act({ action: 'reorder_groups', ids: ordered }, 'group:reorder')
+        }
+
+        const toggleSelectionMode = () => {
+          if (selectionMode) {
+            setSelectionMode(false)
+            setSelected(new Set())
+            return
+          }
+          setSelectionMode(true)
+        }
+
+        const selectEverySkill = () => setSelected(new Set(skills.map((skill) => skill.name)))
+
         const ui = {
           t,
           pending,
           groups,
           selected,
+          selectionMode,
           confirming: confirmGroup,
           renaming,
           collapsed,
@@ -942,6 +1070,7 @@ window.__ModuleLoader__.load({
           onSaveRename,
           onCancelRename,
           onDeleteGroup,
+          onMoveGroup,
           onCancelDelete: () => setConfirmGroup(''),
           onDragStart,
           onDragOver,
@@ -960,6 +1089,8 @@ window.__ModuleLoader__.load({
             ui,
             group,
             skills: byGroup.get(group.id) ?? [],
+            index: groups.indexOf(group),
+            groupCount: groups.length,
           }))
         }
 
@@ -1022,6 +1153,14 @@ window.__ModuleLoader__.load({
           }, t('page.addGroup')),
           h('span', { key: 'spacer', style: { flex: '1 1 auto' } }),
           h('button', {
+            key: 'batchMode',
+            type: 'button',
+            style: Object.assign({}, selectionMode ? S.buttonPrimary : S.button),
+            disabled: skills.length === 0,
+            'aria-pressed': selectionMode ? 'true' : 'false',
+            onClick: toggleSelectionMode,
+          }, selectionMode ? t('page.batchExit') : t('page.batchMode')),
+          h('button', {
             key: 'collapseAll',
             type: 'button',
             style: S.button,
@@ -1039,26 +1178,45 @@ window.__ModuleLoader__.load({
           }, allCollapsed ? t('page.expandAll') : t('page.collapseAll')),
         ])
 
-        const batchBar = selected.size === 0 ? null : h('div', { style: S.batchBar }, [
-          h('span', { key: 'count', style: S.batchCount }, `${t('page.selected')} ${selected.size}`),
+        const batchBar = !selectionMode ? null : h('div', { style: S.batchBar }, [
+          h('span', { key: 'count', style: S.batchCount }, `${t('page.selected')} ${selected.size} / ${skills.length}`),
+          h('button', {
+            key: 'all',
+            type: 'button',
+            style: S.buttonQuiet,
+            disabled: pending !== '',
+            onClick: selectEverySkill,
+          }, t('page.selectAll')),
+          h('button', {
+            key: 'clear',
+            type: 'button',
+            style: S.buttonQuiet,
+            disabled: selected.size === 0,
+            onClick: () => setSelected(new Set()),
+          }, t('page.batchClear')),
+          h('span', {
+            key: 'sep',
+            'aria-hidden': true,
+            style: { width: 1, height: 18, background: 'var(--dsw-alias-border-l1)', flex: '0 0 auto' },
+          }),
           h('button', {
             key: 'enable',
             type: 'button',
             style: S.button,
-            disabled: pending !== '',
+            disabled: pending !== '' || selected.size === 0,
             onClick: () => runBatch('enable'),
           }, t('page.batchEnable')),
           h('button', {
             key: 'disable',
             type: 'button',
             style: S.button,
-            disabled: pending !== '',
+            disabled: pending !== '' || selected.size === 0,
             onClick: () => runBatch('disable'),
           }, t('page.batchDisable')),
           h('select', {
             key: 'move',
             value: '',
-            disabled: pending !== '' || groups.length === 0,
+            disabled: pending !== '' || selected.size === 0 || groups.length === 0,
             'aria-label': t('page.batchMove'),
             title: t('page.batchMove'),
             style: S.select,
@@ -1070,16 +1228,16 @@ window.__ModuleLoader__.load({
             key: 'ungroup',
             type: 'button',
             style: S.button,
-            disabled: pending !== '',
+            disabled: pending !== '' || selected.size === 0,
             onClick: () => runBatch('ungroup'),
           }, t('page.batchUngroup')),
           h('span', { key: 'spacer', style: { flex: '1 1 auto' } }),
           h('button', {
-            key: 'clear',
+            key: 'exit',
             type: 'button',
             style: S.buttonQuiet,
-            onClick: () => setSelected(new Set()),
-          }, t('page.batchClear')),
+            onClick: toggleSelectionMode,
+          }, t('page.batchExit')),
         ])
 
         const body = status === 'loading' && data === null
@@ -1102,9 +1260,13 @@ window.__ModuleLoader__.load({
           : t('page.footer')
         const footer = h('div', { style: S.footer }, footerText)
 
-        const top = [header, toolbar]
-        if (batchBar !== null) top.push(batchBar)
-        return h('div', { style: S.page }, h('div', { style: S.inner }, top.concat(notices, body, [footer])))
+        const children = [header, toolbar].concat(notices, body, [footer])
+        if (batchBar !== null) children.push(batchBar)
+        return h('div', {
+          style: S.page,
+          ref: pageRef,
+          onDragOver: onPageDragOver,
+        }, h('div', { style: S.inner }, children))
       }
     }
 
