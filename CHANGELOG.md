@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-11-02
+
+### Changed
+
+- Critique pass on the index layout: dropped the summary sentence because it
+  repeated the filter counts; gave every group after the first a stronger top
+  rule so boundaries stay visible while scrolling; enlarged the group action
+  glyphs; and turned *Batch actions* into a bordered secondary button while
+  *Collapse all* stays a text action.
+
 ## [1.6.0] - 2026-11-02
 
 ### Changed

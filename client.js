@@ -24,7 +24,6 @@ window.__ModuleLoader__.load({
       'nav.title': 'SKILL 管理',
       'page.title': 'SKILL 管理',
       'page.subtitle': '分组只决定这里的排列，开关才决定是否被索引。',
-      'page.summary': '{total} 个技能，{enabled} 个启用，{disabled} 个已关闭',
       'page.refresh': '刷新',
       'page.loading': '正在读取技能…',
       'page.empty': '还没有发现任何技能。',
@@ -86,7 +85,6 @@ window.__ModuleLoader__.load({
       'nav.title': 'SKILL Manager',
       'page.title': 'SKILL Manager',
       'page.subtitle': 'Groups only change the order here; the switch decides what stays indexed.',
-      'page.summary': '{total} skills, {enabled} enabled, {disabled} off',
       'page.refresh': 'Refresh',
       'page.loading': 'Reading skills…',
       'page.empty': 'No skills discovered yet.',
@@ -162,13 +160,6 @@ window.__ModuleLoader__.load({
         lineHeight: '18px',
         color: 'var(--dsw-alias-label-secondary)',
         maxWidth: 520,
-      },
-      summary: {
-        marginTop: 10,
-        fontSize: 12,
-        lineHeight: '18px',
-        color: 'var(--dsw-alias-label-secondary)',
-        fontVariantNumeric: 'tabular-nums',
       },
       rule: { height: 1, background: 'var(--dsw-alias-border-l1)', marginTop: 14 },
       searchRow: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginTop: 14 },
@@ -250,21 +241,6 @@ window.__ModuleLoader__.load({
         cursor: 'pointer',
         flex: '0 0 auto',
       },
-      textButtonStrong: {
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        height: 28,
-        padding: '0 6px',
-        border: 'none',
-        background: 'transparent',
-        color: 'var(--dsw-alias-brand-primary)',
-        font: 'inherit',
-        fontSize: 12,
-        fontWeight: 600,
-        cursor: 'pointer',
-        flex: '0 0 auto',
-      },
       primary: {
         display: 'inline-flex',
         alignItems: 'center',
@@ -278,6 +254,22 @@ window.__ModuleLoader__.load({
         font: 'inherit',
         fontSize: 12,
         fontWeight: 600,
+        cursor: 'pointer',
+        flex: '0 0 auto',
+        whiteSpace: 'nowrap',
+      },
+      secondary: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 28,
+        padding: '0 10px',
+        borderRadius: 6,
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-primary)',
+        font: 'inherit',
+        fontSize: 12,
         cursor: 'pointer',
         flex: '0 0 auto',
         whiteSpace: 'nowrap',
@@ -368,6 +360,11 @@ window.__ModuleLoader__.load({
         color: 'var(--dsw-alias-label-secondary)',
       },
       section: { marginTop: 22 },
+      sectionDivided: {
+        marginTop: 24,
+        paddingTop: 14,
+        borderTop: '1px solid var(--dsw-alias-border-l2)',
+      },
       groupHead: {
         display: 'flex',
         alignItems: 'center',
@@ -882,7 +879,7 @@ window.__ModuleLoader__.load({
         ])
         : null
 
-      return h('section', { style: S.section }, [
+      return h('section', { style: props.first === true ? S.section : S.sectionDivided }, [
         h('div', {
           key: 'head',
           style: S.groupHead,
@@ -940,7 +937,7 @@ window.__ModuleLoader__.load({
           key: 'trigger',
           type: 'button',
           className: 'sm-menu-trigger sm-quiet',
-          style: S.iconButton,
+          style: Object.assign({}, S.iconButton, { fontSize: 13, width: 24 }),
           title: t('page.actions'),
           'aria-label': t('page.actions'),
           'aria-haspopup': 'menu',
@@ -1317,6 +1314,7 @@ window.__ModuleLoader__.load({
             group: null,
             skills: ungrouped,
             countLabel: countLabel(ungrouped.length, totalUngrouped),
+            first: true,
           }))
         }
         for (const group of groups) {
@@ -1331,6 +1329,7 @@ window.__ModuleLoader__.load({
             index: groups.indexOf(group),
             groupCount: groups.length,
             countLabel: countLabel(list.length, totalsByGroup.get(group.id) ?? 0),
+            first: sections.length === 0,
           }))
         }
 
@@ -1343,11 +1342,6 @@ window.__ModuleLoader__.load({
           h('div', { key: 'titles', style: { minWidth: 0 } }, [
             h('h1', { key: 'title', style: S.title }, t('page.title')),
             h('p', { key: 'subtitle', style: S.subtitle }, t('page.subtitle')),
-            h('div', { key: 'summary', style: S.summary }, fill(t('page.summary'), {
-              total: skills.length,
-              enabled: enabledCount,
-              disabled: skills.length - enabledCount,
-            })),
           ]),
           h('button', {
             key: 'refresh',
@@ -1507,8 +1501,7 @@ window.__ModuleLoader__.load({
             h('button', {
               key: 'batchMode',
               type: 'button',
-              className: 'sm-quiet',
-              style: S.textButtonStrong,
+              style: S.secondary,
               disabled: skills.length === 0,
               onClick: toggleSelectionMode,
             }, t('page.batchMode')),
