@@ -10,10 +10,21 @@ window.__ModuleLoader__.load({
     const ACTION_URL = '/skill-manager/api/action'
     const COLLAPSE_KEY = 'dsh:skill-manager:collapsed'
 
+    /**
+     * Visual direction: a registry index, not a card gallery.
+     *
+     * Harness skills are an inventory — names, providers, an on/off policy and a
+     * user-controlled order. So the page borrows the structure of a printed
+     * index: a fixed order column, hairline table rules, annotations set in
+     * secondary type, and exactly one colour signal per row (the status dot).
+     * No cards, no shadows, no pills; radius is reserved for controls.
+     */
+
     const ZH = {
       'nav.title': 'SKILL 管理',
       'page.title': 'SKILL 管理',
-      'page.subtitle': '整理分组，并决定哪些技能还出现在技能目录与 / 指令里。',
+      'page.subtitle': '分组只决定这里的排列，开关才决定是否被索引。',
+      'page.summary': '{total} 个技能，{enabled} 个启用，{disabled} 个已关闭',
       'page.refresh': '刷新',
       'page.loading': '正在读取技能…',
       'page.empty': '还没有发现任何技能。',
@@ -56,44 +67,45 @@ window.__ModuleLoader__.load({
       'page.renameCancel': '取消',
       'page.renamePlaceholder': '分组名称',
       'page.deleteGroup': '删除分组',
-      'page.confirmDeleteGroup': '确认删除分组',
-      'page.deleteHint': '只删除这个分组，组内技能会回到「未分组」；技能本身、启用状态和文件都不会改变。',
+      'page.confirmDeleteGroup': '确认删除',
+      'page.deleteHint': '只删除这个分组，组内技能回到「未分组」；技能、启用状态和文件都不会改变。',
       'page.groupPicker': '移动到分组',
       'page.cancel': '取消',
-      'page.footer': '分组只是整理用的记录：不会改变技能是否启用、是否被索引，也不会改动技能文件。',
-      'page.errorFetch': '无法连接宿主服务。',
-      'page.hintFetch': '请通过 Web 界面的 http 地址打开本页并刷新；如果仍然失败，请查看 Harness 日志。',
+      'page.note': '{applied} 项已应用，{skipped} 项跳过',
+      'page.noteClean': '{applied} 项已应用',
+      'page.footer': '分组只影响这里的排列；开关不修改技能文件。',
+      'page.errorFetch': '连不上宿主服务。',
+      'page.hintFetch': '请通过 Web 界面的 http 地址打开本页并刷新；仍然失败就查看 Harness 日志。',
       'page.retry': '重试',
-      'page.incomplete': '目录扫描不完整，结果可能有遗漏。',
+      'page.incomplete': '目录扫描不完整，这份列表可能有遗漏。',
       'page.noAgent': '当前没有活动会话，技能来源可能列不全。',
       'page.savedTo': '状态文件',
-      'page.applied': '已应用',
-      'page.skipped': '跳过',
     }
 
     const EN = {
       'nav.title': 'SKILL Manager',
       'page.title': 'SKILL Manager',
-      'page.subtitle': 'Organize groups and decide which skills still appear in the catalog and / commands.',
+      'page.subtitle': 'Groups only change the order here; the switch decides what stays indexed.',
+      'page.summary': '{total} skills, {enabled} enabled, {disabled} off',
       'page.refresh': 'Refresh',
       'page.loading': 'Reading skills…',
-      'page.empty': 'No skills were discovered yet.',
+      'page.empty': 'No skills discovered yet.',
       'page.emptyGroup': 'No skills',
       'page.ungrouped': 'Ungrouped',
       'page.newGroup': 'New group name',
       'page.addGroup': 'Create group',
       'page.filterAll': 'All',
       'page.filterOn': 'Enabled',
-      'page.filterOff': 'Disabled',
+      'page.filterOff': 'Off',
       'page.searchPlaceholder': 'Search name, description, or source',
       'page.clearFilters': 'Clear filters',
-      'page.noMatch': 'No skills match the current filters.',
+      'page.noMatch': 'No skills match those filters.',
       'page.on': 'On',
       'page.off': 'Off',
       'page.missing': 'source missing',
       'page.selectOne': 'Select this skill',
       'page.selectSection': 'Select every skill in this section',
-      'page.selected': 'selected',
+      'page.selected': 'Selected',
       'page.batchMode': 'Batch actions',
       'page.done': 'Done',
       'page.selectAll': 'Select all',
@@ -117,19 +129,19 @@ window.__ModuleLoader__.load({
       'page.renameCancel': 'Cancel',
       'page.renamePlaceholder': 'Group name',
       'page.deleteGroup': 'Delete group',
-      'page.confirmDeleteGroup': 'Confirm delete',
-      'page.deleteHint': 'Only this group is deleted; its skills move back to Ungrouped. Skills, their on/off state, and their files stay untouched.',
+      'page.confirmDeleteGroup': 'Delete',
+      'page.deleteHint': 'Only this group goes away; its skills return to Ungrouped. Skills, their on/off state, and their files stay untouched.',
       'page.groupPicker': 'Move to group',
       'page.cancel': 'Cancel',
-      'page.footer': 'Groups are only labels: they never change whether a skill is on or indexed, and no skill file is touched.',
+      'page.note': '{applied} applied, {skipped} skipped',
+      'page.noteClean': '{applied} applied',
+      'page.footer': 'Groups only change the order here; the switch edits no skill file.',
       'page.errorFetch': 'Cannot reach the host service.',
       'page.hintFetch': 'Open this page through the Web GUI http address and reload; if it still fails, check the Harness log.',
       'page.retry': 'Retry',
-      'page.incomplete': 'Catalog discovery was incomplete, so this list may miss skills.',
-      'page.noAgent': 'No live session right now, so skill sources may be incomplete.',
+      'page.incomplete': 'Discovery was incomplete, so this list may miss skills.',
+      'page.noAgent': 'No live session right now, so sources may be incomplete.',
       'page.savedTo': 'State file',
-      'page.applied': 'Applied',
-      'page.skipped': 'skipped',
     }
 
     const S = {
@@ -139,27 +151,35 @@ window.__ModuleLoader__.load({
         boxSizing: 'border-box',
         background: 'var(--dsw-alias-bg-base)',
         color: 'var(--dsw-alias-label-primary)',
-        padding: '26px 28px 48px',
+        padding: '24px 28px 56px',
       },
-      inner: { maxWidth: 900, margin: '0 auto' },
-      header: { display: 'flex', alignItems: 'flex-start', gap: 16, justifyContent: 'space-between' },
-      title: { margin: 0, fontSize: 19, fontWeight: 600, lineHeight: '26px' },
+      inner: { maxWidth: 880, margin: '0 auto' },
+      masthead: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 },
+      title: { margin: 0, fontSize: 18, fontWeight: 600, lineHeight: '24px', letterSpacing: '0.01em' },
       subtitle: {
         margin: '4px 0 0',
+        fontSize: 12.5,
+        lineHeight: '18px',
+        color: 'var(--dsw-alias-label-secondary)',
+        maxWidth: 520,
+      },
+      summary: {
+        marginTop: 10,
         fontSize: 12,
         lineHeight: '18px',
         color: 'var(--dsw-alias-label-secondary)',
-        maxWidth: 560,
+        fontVariantNumeric: 'tabular-nums',
       },
-      filters: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginTop: 16 },
+      rule: { height: 1, background: 'var(--dsw-alias-border-l1)', marginTop: 14 },
+      searchRow: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginTop: 14 },
       search: {
         flex: '1 1 220px',
         height: 30,
-        minWidth: 180,
-        maxWidth: 340,
+        minWidth: 160,
+        maxWidth: 320,
         boxSizing: 'border-box',
         padding: '0 10px',
-        borderRadius: 8,
+        borderRadius: 6,
         border: '1px solid var(--dsw-alias-border-l1)',
         background: 'var(--dsw-alias-bg-layer-1)',
         color: 'var(--dsw-alias-label-primary)',
@@ -167,14 +187,62 @@ window.__ModuleLoader__.load({
         fontSize: 12,
         outline: 'none',
       },
-      chip: {
+      tabs: { display: 'inline-flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' },
+      tab: {
+        display: 'inline-flex',
+        alignItems: 'baseline',
+        gap: 5,
+        height: 30,
+        padding: '0 1px',
+        border: 'none',
+        borderBottom: '2px solid transparent',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-secondary)',
+        font: 'inherit',
+        fontSize: 12,
+        cursor: 'pointer',
+      },
+      tabActive: {
+        display: 'inline-flex',
+        alignItems: 'baseline',
+        gap: 5,
+        height: 30,
+        padding: '0 1px',
+        border: 'none',
+        borderBottom: '2px solid var(--dsw-alias-brand-primary)',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-primary)',
+        font: 'inherit',
+        fontSize: 12,
+        fontWeight: 600,
+        cursor: 'pointer',
+      },
+      tabCount: {
+        fontSize: 11,
+        color: 'var(--dsw-alias-label-secondary)',
+        fontVariantNumeric: 'tabular-nums',
+      },
+      actions: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginTop: 12 },
+      input: {
+        height: 28,
+        width: 180,
+        boxSizing: 'border-box',
+        padding: '0 9px',
+        borderRadius: 6,
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: 'var(--dsw-alias-bg-layer-1)',
+        color: 'var(--dsw-alias-label-primary)',
+        font: 'inherit',
+        fontSize: 12,
+        outline: 'none',
+      },
+      textButton: {
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 5,
-        height: 26,
-        padding: '0 10px',
-        borderRadius: 13,
-        border: '1px solid var(--dsw-alias-border-l1)',
+        gap: 4,
+        height: 28,
+        padding: '0 6px',
+        border: 'none',
         background: 'transparent',
         color: 'var(--dsw-alias-label-secondary)',
         font: 'inherit',
@@ -182,14 +250,13 @@ window.__ModuleLoader__.load({
         cursor: 'pointer',
         flex: '0 0 auto',
       },
-      chipActive: {
+      textButtonStrong: {
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 5,
-        height: 26,
-        padding: '0 10px',
-        borderRadius: 13,
-        border: '1px solid var(--dsw-alias-brand-primary)',
+        gap: 4,
+        height: 28,
+        padding: '0 6px',
+        border: 'none',
         background: 'transparent',
         color: 'var(--dsw-alias-brand-primary)',
         font: 'inherit',
@@ -198,68 +265,14 @@ window.__ModuleLoader__.load({
         cursor: 'pointer',
         flex: '0 0 auto',
       },
-      chipCount: { fontSize: 11, opacity: 0.75 },
-      toolbar: {
-        display: 'flex',
-        flexWrap: 'wrap',
+      primary: {
+        display: 'inline-flex',
         alignItems: 'center',
-        gap: 8,
-        marginTop: 12,
-        paddingBottom: 12,
-        borderBottom: '1px solid var(--dsw-alias-border-l1)',
-      },
-      divider: { width: 1, height: 18, background: 'var(--dsw-alias-border-l1)', flex: '0 0 auto' },
-      input: {
-        height: 30,
-        width: 180,
-        boxSizing: 'border-box',
-        padding: '0 10px',
-        borderRadius: 8,
-        border: '1px solid var(--dsw-alias-border-l1)',
-        background: 'var(--dsw-alias-bg-layer-1)',
-        color: 'var(--dsw-alias-label-primary)',
-        font: 'inherit',
-        fontSize: 12,
-        outline: 'none',
-      },
-      renameInput: {
-        height: 26,
-        width: 190,
-        boxSizing: 'border-box',
-        padding: '0 8px',
+        justifyContent: 'center',
+        height: 28,
+        padding: '0 12px',
         borderRadius: 6,
         border: '1px solid var(--dsw-alias-brand-primary)',
-        background: 'var(--dsw-alias-bg-layer-1)',
-        color: 'var(--dsw-alias-label-primary)',
-        font: 'inherit',
-        fontSize: 13,
-        outline: 'none',
-      },
-      button: {
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 6,
-        height: 28,
-        padding: '0 10px',
-        borderRadius: 7,
-        border: '1px solid var(--dsw-alias-border-l2)',
-        background: 'transparent',
-        color: 'var(--dsw-alias-label-primary)',
-        font: 'inherit',
-        fontSize: 12,
-        cursor: 'pointer',
-        flex: '0 0 auto',
-        whiteSpace: 'nowrap',
-      },
-      buttonPrimary: {
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 30,
-        padding: '0 12px',
-        borderRadius: 8,
-        border: '1px solid var(--dsw-alias-brand-primary)',
         background: 'transparent',
         color: 'var(--dsw-alias-brand-primary)',
         font: 'inherit',
@@ -269,13 +282,13 @@ window.__ModuleLoader__.load({
         flex: '0 0 auto',
         whiteSpace: 'nowrap',
       },
-      buttonQuiet: {
+      quiet: {
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
         height: 24,
         padding: '0 8px',
-        borderRadius: 6,
+        borderRadius: 5,
         border: '1px solid transparent',
         background: 'transparent',
         color: 'var(--dsw-alias-label-secondary)',
@@ -285,14 +298,14 @@ window.__ModuleLoader__.load({
         flex: '0 0 auto',
         whiteSpace: 'nowrap',
       },
-      buttonDanger: {
+      quietDanger: {
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
         height: 24,
         padding: '0 8px',
-        borderRadius: 6,
-        border: '1px solid var(--dsw-alias-state-error-primary)',
+        borderRadius: 5,
+        border: '1px solid transparent',
         background: 'transparent',
         color: 'var(--dsw-alias-state-error-primary)',
         font: 'inherit',
@@ -305,75 +318,76 @@ window.__ModuleLoader__.load({
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        width: 24,
-        height: 24,
+        width: 22,
+        height: 22,
         padding: 0,
-        borderRadius: 6,
-        border: '1px solid transparent',
+        borderRadius: 5,
+        border: 'none',
         background: 'transparent',
         color: 'var(--dsw-alias-label-secondary)',
         font: 'inherit',
-        fontSize: 12,
+        fontSize: 11,
         lineHeight: '16px',
         cursor: 'pointer',
         flex: '0 0 auto',
       },
-      banner: {
+      selectionStrip: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: 10,
         marginTop: 12,
-        padding: '10px 12px',
-        borderRadius: 8,
+        padding: '8px 0 10px',
+        borderTop: '2px solid var(--dsw-alias-brand-primary)',
+        borderBottom: '1px solid var(--dsw-alias-border-l1)',
+      },
+      selectionCount: {
+        fontSize: 12,
+        fontWeight: 600,
+        color: 'var(--dsw-alias-brand-primary)',
+        fontVariantNumeric: 'tabular-nums',
+        flex: '0 0 auto',
+      },
+      divider: { width: 1, height: 16, background: 'var(--dsw-alias-border-l1)', flex: '0 0 auto' },
+      alerts: { marginTop: 12 },
+      alert: {
+        padding: '8px 10px',
+        borderRadius: 6,
         border: '1px solid var(--dsw-alias-state-error-primary)',
         color: 'var(--dsw-alias-state-error-primary)',
         fontSize: 12,
         lineHeight: '18px',
         whiteSpace: 'pre-wrap',
         overflowWrap: 'anywhere',
+        marginBottom: 6,
       },
-      notice: {
-        marginTop: 12,
-        padding: '9px 12px',
-        borderRadius: 8,
-        border: '1px solid var(--dsw-alias-border-l1)',
-        background: 'var(--dsw-alias-bg-layer-1)',
+      noteLine: {
+        padding: '4px 0',
+        fontSize: 12,
+        lineHeight: '18px',
         color: 'var(--dsw-alias-label-secondary)',
-        fontSize: 12,
-        lineHeight: '18px',
       },
-      note: {
-        marginTop: 12,
-        padding: '8px 12px',
-        borderRadius: 8,
-        border: '1px solid var(--dsw-alias-state-success-primary)',
-        color: 'var(--dsw-alias-state-success-primary)',
-        fontSize: 12,
-        lineHeight: '18px',
-      },
-      section: { marginTop: 18 },
-      sectionHead: {
+      section: { marginTop: 22 },
+      groupHead: {
         display: 'flex',
         alignItems: 'center',
         gap: 6,
-        padding: '5px 6px',
-        margin: '0 -6px',
-        borderRadius: 7,
-        flexWrap: 'wrap',
+        padding: '4px 0',
+        minHeight: 30,
+        cursor: 'pointer',
       },
-      sectionTitle: { fontSize: 13, fontWeight: 600, color: 'var(--dsw-alias-label-primary)' },
-      countPill: {
-        display: 'inline-flex',
-        alignItems: 'center',
-        height: 18,
-        padding: '0 7px',
-        borderRadius: 9,
-        background: 'var(--dsw-alias-bg-layer-2)',
+      order: {
+        width: 24,
+        textAlign: 'right',
+        fontSize: 11,
         color: 'var(--dsw-alias-label-secondary)',
-        fontSize: 10,
-        lineHeight: '16px',
+        fontVariantNumeric: 'tabular-nums',
         flex: '0 0 auto',
+        marginRight: 2,
       },
       chevron: {
-        width: 20,
-        height: 20,
+        width: 18,
+        height: 18,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -382,25 +396,38 @@ window.__ModuleLoader__.load({
         color: 'var(--dsw-alias-label-secondary)',
         cursor: 'pointer',
         padding: 0,
-        fontSize: 10,
+        fontSize: 9,
         flex: '0 0 auto',
       },
-      checkbox: {
-        width: 14,
-        height: 14,
-        margin: 0,
-        accentColor: 'var(--dsw-alias-brand-primary)',
-        cursor: 'pointer',
+      groupName: { fontSize: 13, fontWeight: 600, color: 'var(--dsw-alias-label-primary)', flex: '0 0 auto' },
+      groupCount: {
+        fontSize: 11,
+        color: 'var(--dsw-alias-label-secondary)',
+        fontVariantNumeric: 'tabular-nums',
         flex: '0 0 auto',
+      },
+      spacer: { flex: '1 1 auto' },
+      renameInput: {
+        height: 24,
+        width: 180,
+        boxSizing: 'border-box',
+        padding: '0 7px',
+        borderRadius: 5,
+        border: '1px solid var(--dsw-alias-brand-primary)',
+        background: 'var(--dsw-alias-bg-base)',
+        color: 'var(--dsw-alias-label-primary)',
+        font: 'inherit',
+        fontSize: 13,
+        outline: 'none',
       },
       menuWrap: { position: 'relative', display: 'inline-flex', flex: '0 0 auto' },
       menu: {
         position: 'absolute',
         top: '100%',
         right: 0,
-        marginTop: 4,
+        marginTop: 2,
         zIndex: 30,
-        minWidth: 148,
+        minWidth: 132,
         padding: 4,
         borderRadius: 8,
         border: '1px solid var(--dsw-alias-border-l1)',
@@ -417,7 +444,7 @@ window.__ModuleLoader__.load({
         color: 'var(--dsw-alias-label-primary)',
         font: 'inherit',
         fontSize: 12,
-        borderRadius: 6,
+        borderRadius: 4,
         cursor: 'pointer',
         textAlign: 'left',
         whiteSpace: 'nowrap',
@@ -433,85 +460,76 @@ window.__ModuleLoader__.load({
         color: 'var(--dsw-alias-state-error-primary)',
         font: 'inherit',
         fontSize: 12,
-        borderRadius: 6,
+        borderRadius: 4,
         cursor: 'pointer',
         textAlign: 'left',
         whiteSpace: 'nowrap',
       },
-      sectionConfirm: {
+      confirm: {
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
         gap: 8,
         margin: '2px 0 8px',
-        padding: '8px 10px',
-        borderRadius: 8,
-        border: '1px solid var(--dsw-alias-state-warn-primary)',
-        color: 'var(--dsw-alias-label-secondary)',
+        paddingLeft: 10,
+        borderLeft: '2px solid var(--dsw-alias-state-warn-primary)',
         fontSize: 11,
         lineHeight: '16px',
+        color: 'var(--dsw-alias-label-secondary)',
       },
-      card: {
-        border: '1px solid var(--dsw-alias-border-l1)',
-        borderRadius: 10,
-        overflow: 'hidden',
-        background: 'var(--dsw-alias-bg-layer-1)',
+      confirmText: { flex: '1 1 240px' },
+      rows: {},
+      row: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+        padding: '8px 0',
+        borderTop: '1px solid var(--dsw-alias-border-l1)',
       },
-      row: { display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px' },
-      rowDivider: { borderTop: '1px solid var(--dsw-alias-border-l1)' },
       rowMain: { flex: '1 1 auto', minWidth: 0 },
-      rowTitle: { display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap', minWidth: 0 },
+      rowTitle: {
+        display: 'flex',
+        alignItems: 'baseline',
+        gap: 8,
+        minWidth: 0,
+        flexWrap: 'nowrap',
+      },
       skillName: {
         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
         fontSize: 12.5,
-        fontWeight: 600,
         color: 'var(--dsw-alias-label-primary)',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
         flex: '0 1 auto',
       },
+      source: {
+        fontSize: 11,
+        color: 'var(--dsw-alias-label-secondary)',
+        whiteSpace: 'nowrap',
+        flex: '0 0 auto',
+      },
+      sourceMissing: {
+        fontSize: 11,
+        color: 'var(--dsw-alias-state-warn-primary)',
+        whiteSpace: 'nowrap',
+        flex: '0 0 auto',
+      },
       description: {
         marginTop: 2,
-        fontSize: 11.5,
+        fontSize: 12,
         lineHeight: '17px',
         color: 'var(--dsw-alias-label-secondary)',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
       },
-      badge: {
-        display: 'inline-flex',
-        alignItems: 'center',
-        height: 17,
-        padding: '0 6px',
-        borderRadius: 5,
-        border: '1px solid var(--dsw-alias-border-l1)',
-        color: 'var(--dsw-alias-label-secondary)',
-        fontSize: 10,
-        lineHeight: '15px',
-        whiteSpace: 'nowrap',
-        flex: '0 0 auto',
-      },
-      badgeWarn: {
-        display: 'inline-flex',
-        alignItems: 'center',
-        height: 17,
-        padding: '0 6px',
-        borderRadius: 5,
-        border: '1px solid var(--dsw-alias-state-warn-primary)',
-        color: 'var(--dsw-alias-state-warn-primary)',
-        fontSize: 10,
-        lineHeight: '15px',
-        whiteSpace: 'nowrap',
-        flex: '0 0 auto',
-      },
-      groupPicker: {
-        height: 24,
-        maxWidth: 130,
+      picker: {
+        height: 22,
+        maxWidth: 118,
         boxSizing: 'border-box',
-        padding: '0 6px',
-        borderRadius: 6,
+        padding: '0 4px',
+        borderRadius: 4,
         border: '1px solid transparent',
         background: 'transparent',
         color: 'var(--dsw-alias-label-secondary)',
@@ -520,45 +538,60 @@ window.__ModuleLoader__.load({
         cursor: 'pointer',
         flex: '0 0 auto',
       },
-      select: {
-        height: 26,
-        maxWidth: 150,
-        boxSizing: 'border-box',
-        padding: '0 6px',
-        borderRadius: 7,
-        border: '1px solid var(--dsw-alias-border-l1)',
-        background: 'var(--dsw-alias-bg-layer-2)',
-        color: 'var(--dsw-alias-label-primary)',
+      status: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        height: 24,
+        padding: '0 4px',
+        border: 'none',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-secondary)',
         font: 'inherit',
         fontSize: 11.5,
+        cursor: 'pointer',
         flex: '0 0 auto',
+        whiteSpace: 'nowrap',
       },
-      muted: { fontSize: 12, color: 'var(--dsw-alias-label-secondary)', lineHeight: '18px' },
-      emptyRow: { padding: '10px 12px', fontSize: 11.5, color: 'var(--dsw-alias-label-secondary)' },
+      statusDot: { width: 6, height: 6, borderRadius: 3, flex: '0 0 auto' },
+      emptyRow: { padding: '8px 0', fontSize: 11.5, color: 'var(--dsw-alias-label-secondary)', borderTop: '1px solid var(--dsw-alias-border-l1)' },
+      emptyState: { marginTop: 28, fontSize: 12.5, color: 'var(--dsw-alias-label-secondary)' },
+      emptyAction: { marginTop: 10 },
       footer: {
-        marginTop: 22,
+        marginTop: 28,
         paddingTop: 12,
         borderTop: '1px solid var(--dsw-alias-border-l1)',
-        fontSize: 10.5,
+        fontSize: 11,
         lineHeight: '17px',
         color: 'var(--dsw-alias-label-secondary)',
         overflowWrap: 'anywhere',
       },
+      checkbox: {
+        width: 14,
+        height: 14,
+        margin: 0,
+        accentColor: 'var(--dsw-alias-brand-primary)',
+        cursor: 'pointer',
+        flex: '0 0 auto',
+      },
     }
 
-    // Component-local enhancements that inline styles cannot express. Rendered
-    // as an element so unmounting the panel removes them with everything else.
+    // Component-local behaviour that inline styles cannot express: hover bands,
+    // a visible keyboard focus ring, and a reduced-motion opt-out.
     const STYLE_TEXT = [
+      '.sm-panel .sm-row:hover { background: var(--dsw-alias-bg-layer-1); }',
       '.sm-panel .sm-row { transition: background 120ms ease; }',
-      '.sm-panel .sm-row:hover { background: var(--dsw-alias-bg-layer-2); }',
-      '.sm-panel .sm-row:hover .sm-group-picker { border-color: var(--dsw-alias-border-l1); }',
-      '.sm-panel .sm-section-head:hover { background: var(--dsw-alias-bg-layer-1); }',
+      '.sm-panel .sm-quiet:hover:not(:disabled) { color: var(--dsw-alias-label-primary); }',
+      '.sm-panel .sm-picker:hover, .sm-panel .sm-picker:focus-visible { border-color: var(--dsw-alias-border-l1); }',
       '.sm-panel .sm-menu-item:hover:not(:disabled) { background: var(--dsw-alias-bg-layer-2); }',
       '.sm-panel button:focus-visible, .sm-panel input:focus-visible, .sm-panel select:focus-visible {',
       '  outline: 2px solid var(--dsw-alias-brand-primary);',
       '  outline-offset: 1px;',
       '}',
-      '.sm-panel button:disabled { opacity: 0.45; cursor: default; }',
+      '.sm-panel button:disabled { opacity: 0.4; cursor: default; }',
+      '@media (prefers-reduced-motion: reduce) {',
+      '  .sm-panel .sm-row { transition: none; }',
+      '}',
     ].join('\n')
 
     function messageOf(failure) {
@@ -567,6 +600,12 @@ window.__ModuleLoader__.load({
         if (typeof text === 'string' && text !== '') return text
       }
       return String(failure)
+    }
+
+    function fill(template, values) {
+      return template.replace(/\{(\w+)\}/g, (match, key) => (
+        values[key] === undefined ? match : String(values[key])
+      ))
     }
 
     async function request(url, body) {
@@ -621,60 +660,40 @@ window.__ModuleLoader__.load({
       }
     }
 
-    function Badge(props) {
-      return h('span', { style: props.warn === true ? S.badgeWarn : S.badge }, props.children)
-    }
-
-    function FilterChip(props) {
+    function Tab(props) {
       return h('button', {
         type: 'button',
         'aria-pressed': props.active === true ? 'true' : 'false',
         onClick: props.onClick,
-        style: props.active === true ? S.chipActive : S.chip,
-      }, props.label, h('span', { style: S.chipCount }, String(props.count)))
+        style: props.active === true ? S.tabActive : S.tab,
+      }, props.label, h('span', { style: S.tabCount }, String(props.count)))
     }
 
-    function Toggle(props) {
+    function StatusToggle(props) {
       const t = props.t
       const on = props.on === true
-      const disabled = props.disabled === true
       return h('button', {
         type: 'button',
         role: 'switch',
+        className: 'sm-quiet',
         'aria-checked': on ? 'true' : 'false',
         'aria-label': on ? t('page.on') : t('page.off'),
         title: on ? t('page.on') : t('page.off'),
-        disabled,
+        disabled: props.disabled === true,
         onClick: props.onClick,
-        style: {
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          height: 24,
-          padding: '0 10px',
-          borderRadius: 12,
-          border: `1px solid ${on ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-border-l2)'}`,
-          background: 'transparent',
-          color: on ? 'var(--dsw-alias-state-success-primary)' : 'var(--dsw-alias-state-idle-primary)',
-          font: 'inherit',
-          fontSize: 11,
-          fontWeight: 600,
-          cursor: disabled ? 'default' : 'pointer',
-          opacity: disabled ? 0.55 : 1,
-          flex: '0 0 auto',
-          whiteSpace: 'nowrap',
-        },
-      }, h('span', {
-        'aria-hidden': true,
-        style: {
-          width: 6,
-          height: 6,
-          borderRadius: 3,
-          background: 'currentColor',
-          display: 'inline-block',
-          flex: '0 0 auto',
-        },
-      }), on ? t('page.on') : t('page.off'))
+        style: S.status,
+      }, [
+        h('span', {
+          key: 'dot',
+          'aria-hidden': true,
+          style: Object.assign({}, S.statusDot, {
+            background: on
+              ? 'var(--dsw-alias-state-success-primary)'
+              : 'var(--dsw-alias-state-idle-primary)',
+          }),
+        }),
+        on ? t('page.on') : t('page.off'),
+      ])
     }
 
     function SkillRow(props) {
@@ -685,10 +704,10 @@ window.__ModuleLoader__.load({
       const selected = ui.selected.has(skill.name)
       const title = [h('span', { key: 'name', style: S.skillName }, skill.name)]
       if (typeof skill.source === 'string' && skill.source !== '') {
-        title.push(h(Badge, { key: 'source' }, skill.source))
+        title.push(h('span', { key: 'source', style: S.source }, skill.source))
       }
       if (skill.available === false) {
-        title.push(h(Badge, { key: 'missing', warn: true }, t('page.missing')))
+        title.push(h('span', { key: 'missing', style: S.sourceMissing }, t('page.missing')))
       }
       const children = []
       if (ui.selectionMode) {
@@ -715,28 +734,25 @@ window.__ModuleLoader__.load({
       children.push(
         h('select', {
           key: 'group',
-          className: 'sm-group-picker',
+          className: 'sm-picker',
           value: typeof skill.groupId === 'string' ? skill.groupId : '',
           disabled: busy || ui.groups.length === 0,
           onChange: (event) => ui.onAssignSkill(skill.name, event.target.value),
-          style: S.groupPicker,
+          style: S.picker,
           title: t('page.groupPicker'),
           'aria-label': t('page.groupPicker'),
         }, [h('option', { key: '', value: '' }, t('page.ungrouped'))].concat(
           ui.groups.map((group) => h('option', { key: group.id, value: group.id }, group.name)),
         )),
-        h(Toggle, {
-          key: 'toggle',
+        h(StatusToggle, {
+          key: 'status',
           t,
           on: skill.enabled,
           disabled: busy,
           onClick: () => ui.onToggleSkill(skill),
         }),
       )
-      return h('div', {
-        className: 'sm-row',
-        style: props.first === true ? S.row : Object.assign({}, S.row, S.rowDivider),
-      }, children)
+      return h('div', { className: 'sm-row', style: S.row }, children)
     }
 
     function GroupSection(props) {
@@ -753,7 +769,9 @@ window.__ModuleLoader__.load({
       const isFirst = group !== null && props.index === 0
       const isLast = group !== null && props.index === props.groupCount - 1
 
-      const head = []
+      const head = [
+        h('span', { key: 'order', style: S.order }, group === null ? '–' : String(props.index + 1)),
+      ]
       if (ui.selectionMode) {
         head.push(h('input', {
           key: 'selectSect',
@@ -796,23 +814,24 @@ window.__ModuleLoader__.load({
         head.push(h('button', {
           key: 'renameSave',
           type: 'button',
-          style: S.buttonQuiet,
+          style: S.quiet,
           onClick: () => ui.onSaveRename(),
         }, t('page.renameSave')))
         head.push(h('button', {
           key: 'renameCancel',
           type: 'button',
-          style: S.buttonQuiet,
+          style: S.quiet,
           onClick: () => ui.onCancelRename(),
         }, t('page.renameCancel')))
       } else {
-        head.push(h('span', { key: 'title', style: S.sectionTitle }, group === null ? t('page.ungrouped') : group.name))
-        head.push(h('span', { key: 'count', style: S.countPill }, props.countLabel))
-        head.push(h('span', { key: 'spacer', style: { flex: '1 1 auto' } }))
+        head.push(h('span', { key: 'name', style: S.groupName }, group === null ? t('page.ungrouped') : group.name))
+        head.push(h('span', { key: 'count', style: S.groupCount }, props.countLabel))
+        head.push(h('span', { key: 'spacer', style: S.spacer }))
         if (group !== null && !ui.selectionMode) {
           head.push(h('button', {
             key: 'up',
             type: 'button',
+            className: 'sm-quiet',
             style: S.iconButton,
             title: t('page.moveUp'),
             'aria-label': t('page.moveUp'),
@@ -825,6 +844,7 @@ window.__ModuleLoader__.load({
           head.push(h('button', {
             key: 'down',
             type: 'button',
+            className: 'sm-quiet',
             style: S.iconButton,
             title: t('page.moveDown'),
             'aria-label': t('page.moveDown'),
@@ -842,27 +862,21 @@ window.__ModuleLoader__.load({
         ? []
         : [skills.length === 0
           ? h('div', { key: 'empty', style: S.emptyRow }, t('page.emptyGroup'))
-          : skills.map((skill, index) => h(SkillRow, {
-            key: skill.name,
-            t,
-            ui,
-            skill,
-            first: index === 0,
-          }))]
+          : skills.map((skill) => h(SkillRow, { key: skill.name, t, ui, skill }))]
 
       const confirmStrip = confirming
-        ? h('div', { key: 'confirm', style: S.sectionConfirm }, [
-          h('span', { key: 'hint', style: { flex: '1 1 240px' } }, t('page.deleteHint')),
+        ? h('div', { key: 'confirm', style: S.confirm }, [
+          h('span', { key: 'hint', style: S.confirmText }, t('page.deleteHint')),
           h('button', {
             key: 'cancel',
             type: 'button',
-            style: S.buttonQuiet,
+            style: S.quiet,
             onClick: () => ui.onCancelDelete(),
           }, t('page.cancel')),
           h('button', {
             key: 'ok',
             type: 'button',
-            style: S.buttonDanger,
+            style: S.quietDanger,
             onClick: () => ui.onDeleteGroup(group, true),
           }, t('page.confirmDeleteGroup')),
         ])
@@ -871,21 +885,21 @@ window.__ModuleLoader__.load({
       return h('section', { style: S.section }, [
         h('div', {
           key: 'head',
-          className: 'sm-section-head',
-          style: S.sectionHead,
+          style: S.groupHead,
           onClick: (event) => {
-            if (event.target !== null && event.target.closest !== undefined && event.target.closest('button,input,select')) return
+            if (event.target !== null && event.target.closest !== undefined
+              && event.target.closest('button,input,select,label')) return
             ui.onToggleCollapse(sectionKey)
           },
         }, head),
         confirmStrip,
-        collapsed ? null : h('div', { key: 'body', style: S.card }, body),
+        collapsed ? null : h('div', { key: 'body', style: S.rows }, body),
       ])
     }
 
     /**
-     * Group actions live behind one overflow control, so the header keeps a
-     * single quiet row: title, count, then move controls.
+     * Group actions sit behind one overflow control so the header stays a
+     * single quiet row: order, name, count, then the move controls.
      */
     function menuNode(t, ui, group, open, isFirst, isLast) {
       const items = [
@@ -921,11 +935,11 @@ window.__ModuleLoader__.load({
         },
       }, t('page.deleteGroup')))
 
-      return h('div', { key: 'menuWrap', className: 'sm-menu-wrap', style: S.menuWrap }, [
+      return h('div', { key: 'menuWrap', style: S.menuWrap }, [
         h('button', {
           key: 'trigger',
           type: 'button',
-          className: 'sm-menu-btn',
+          className: 'sm-menu-trigger sm-quiet',
           style: S.iconButton,
           title: t('page.actions'),
           'aria-label': t('page.actions'),
@@ -979,7 +993,7 @@ window.__ModuleLoader__.load({
           if (menuGroupId === null) return undefined
           const onPointerDown = (event) => {
             const target = event.target
-            if (target instanceof Element && (target.closest('.sm-menu') || target.closest('.sm-menu-btn'))) return
+            if (target instanceof Element && (target.closest('.sm-menu') || target.closest('.sm-menu-trigger'))) return
             setMenuGroupId(null)
           }
           document.addEventListener('mousedown', onPointerDown)
@@ -1062,10 +1076,9 @@ window.__ModuleLoader__.load({
             const result = next.result
             if (result !== null && typeof result === 'object' && Array.isArray(result.applied)) {
               const skipped = Array.isArray(result.skipped) ? result.skipped.length : 0
-              setNote(
-                `${t('page.applied')} ${result.applied.length}` +
-                  (skipped > 0 ? ` · ${t('page.skipped')} ${skipped}` : ''),
-              )
+              setNote(skipped > 0
+                ? fill(t('page.note'), { applied: result.applied.length, skipped })
+                : fill(t('page.noteClean'), { applied: result.applied.length }))
             }
             return next
           } catch (failure) {
@@ -1160,9 +1173,7 @@ window.__ModuleLoader__.load({
         }, [query, statusFilter])
 
         const onSelectSection = (sectionKey) => {
-          const inSection = sectionKey === 'ungrouped'
-            ? ungrouped
-            : (byGroup.get(sectionKey) ?? [])
+          const inSection = sectionKey === 'ungrouped' ? ungrouped : (byGroup.get(sectionKey) ?? [])
           setSelected((previous) => {
             const next = new Set(previous)
             const all = inSection.length > 0 && inSection.every((skill) => next.has(skill.name))
@@ -1326,21 +1337,29 @@ window.__ModuleLoader__.load({
         const sectionKeys = (ungrouped.length > 0 ? ['ungrouped'] : []).concat(groups.map((group) => group.id))
         const allCollapsed = sectionKeys.length > 0 && sectionKeys.every((key) => collapsed.has(key))
 
-        const header = h('header', { key: 'header', style: S.header }, [
+        const enabledCount = skills.filter((skill) => skill.enabled === true).length
+
+        const masthead = h('header', { key: 'masthead', style: S.masthead }, [
           h('div', { key: 'titles', style: { minWidth: 0 } }, [
             h('h1', { key: 'title', style: S.title }, t('page.title')),
             h('p', { key: 'subtitle', style: S.subtitle }, t('page.subtitle')),
+            h('div', { key: 'summary', style: S.summary }, fill(t('page.summary'), {
+              total: skills.length,
+              enabled: enabledCount,
+              disabled: skills.length - enabledCount,
+            })),
           ]),
           h('button', {
             key: 'refresh',
             type: 'button',
-            style: S.button,
+            className: 'sm-quiet',
+            style: S.textButton,
             disabled: status === 'loading' || pending !== '',
             onClick: () => load(),
           }, t('page.refresh')),
         ])
 
-        const filters = h('div', { key: 'filters', style: S.filters }, [
+        const searchRow = h('div', { key: 'searchRow', style: S.searchRow }, [
           h('input', {
             key: 'search',
             type: 'search',
@@ -1350,59 +1369,65 @@ window.__ModuleLoader__.load({
             style: S.search,
             onChange: (event) => setQuery(event.target.value),
           }),
-          h(FilterChip, {
-            key: 'all',
-            label: t('page.filterAll'),
-            count: skills.length,
-            active: statusFilter === 'all',
-            onClick: () => setStatusFilter('all'),
-          }),
-          h(FilterChip, {
-            key: 'on',
-            label: t('page.filterOn'),
-            count: skills.filter((skill) => skill.enabled === true).length,
-            active: statusFilter === 'on',
-            onClick: () => setStatusFilter('on'),
-          }),
-          h(FilterChip, {
-            key: 'off',
-            label: t('page.filterOff'),
-            count: skills.filter((skill) => skill.enabled !== true).length,
-            active: statusFilter === 'off',
-            onClick: () => setStatusFilter('off'),
-          }),
+          h('div', { key: 'tabs', style: S.tabs }, [
+            h(Tab, {
+              key: 'all',
+              label: t('page.filterAll'),
+              count: skills.length,
+              active: statusFilter === 'all',
+              onClick: () => setStatusFilter('all'),
+            }),
+            h(Tab, {
+              key: 'on',
+              label: t('page.filterOn'),
+              count: enabledCount,
+              active: statusFilter === 'on',
+              onClick: () => setStatusFilter('on'),
+            }),
+            h(Tab, {
+              key: 'off',
+              label: t('page.filterOff'),
+              count: skills.length - enabledCount,
+              active: statusFilter === 'off',
+              onClick: () => setStatusFilter('off'),
+            }),
+          ]),
           hasFilter
             ? h('button', {
               key: 'clearFilters',
               type: 'button',
-              style: S.buttonQuiet,
+              className: 'sm-quiet',
+              style: S.textButton,
               onClick: clearFilters,
             }, t('page.clearFilters'))
             : null,
         ])
 
-        const selectionToolbar = selectionMode
-          ? h('div', { key: 'selection-toolbar', style: S.toolbar }, [
-            h('span', { key: 'count', style: { fontSize: 12, fontWeight: 600, color: 'var(--dsw-alias-brand-primary)' } },
+        const selectionStrip = selectionMode
+          ? h('div', { key: 'selection', style: S.selectionStrip }, [
+            h('span', { key: 'count', style: S.selectionCount },
               `${t('page.selected')} ${selected.size} / ${visibleSkills.length}`),
             h('button', {
               key: 'all',
               type: 'button',
-              style: S.button,
+              className: 'sm-quiet',
+              style: S.textButton,
               disabled: pending !== '',
               onClick: selectVisibleSkills,
             }, t('page.selectAll')),
             h('button', {
               key: 'invert',
               type: 'button',
-              style: S.button,
+              className: 'sm-quiet',
+              style: S.textButton,
               disabled: pending !== '',
               onClick: invertSelection,
             }, t('page.invert')),
             h('button', {
               key: 'clear',
               type: 'button',
-              style: S.button,
+              className: 'sm-quiet',
+              style: S.textButton,
               disabled: selected.size === 0,
               onClick: () => setSelected(new Set()),
             }, t('page.batchClear')),
@@ -1410,14 +1435,16 @@ window.__ModuleLoader__.load({
             h('button', {
               key: 'enable',
               type: 'button',
-              style: S.button,
+              className: 'sm-quiet',
+              style: S.textButton,
               disabled: pending !== '' || selected.size === 0,
               onClick: () => runBatch('enable'),
             }, t('page.batchEnable')),
             h('button', {
               key: 'disable',
               type: 'button',
-              style: S.button,
+              className: 'sm-quiet',
+              style: S.textButton,
               disabled: pending !== '' || selected.size === 0,
               onClick: () => runBatch('disable'),
             }, t('page.batchDisable')),
@@ -1427,7 +1454,7 @@ window.__ModuleLoader__.load({
               disabled: pending !== '' || selected.size === 0 || groups.length === 0,
               'aria-label': t('page.batchMove'),
               title: t('page.batchMove'),
-              style: S.select,
+              style: S.input,
               onChange: (event) => {
                 const groupId = event.target.value
                 if (groupId !== '') runBatch('assign', { group_id: groupId })
@@ -1438,23 +1465,24 @@ window.__ModuleLoader__.load({
             h('button', {
               key: 'ungroup',
               type: 'button',
-              style: S.button,
+              className: 'sm-quiet',
+              style: S.textButton,
               disabled: pending !== '' || selected.size === 0,
               onClick: () => runBatch('ungroup'),
             }, t('page.batchUngroup')),
-            h('span', { key: 'spacer', style: { flex: '1 1 auto' } }),
+            h('span', { key: 'spacer', style: S.spacer }),
             h('button', {
               key: 'done',
               type: 'button',
-              style: S.buttonPrimary,
+              style: S.primary,
               onClick: toggleSelectionMode,
             }, t('page.done')),
           ])
           : null
 
-        const normalToolbar = selectionMode
+        const normalActions = selectionMode
           ? null
-          : h('div', { key: 'normal-toolbar', style: S.toolbar }, [
+          : h('div', { key: 'actions', style: S.actions }, [
             h('input', {
               key: 'draft',
               value: draftGroup,
@@ -1471,22 +1499,24 @@ window.__ModuleLoader__.load({
             h('button', {
               key: 'create',
               type: 'button',
-              style: S.buttonPrimary,
+              style: S.primary,
               disabled: draftGroup.trim() === '' || pending === 'group:create',
               onClick: onCreateGroup,
             }, t('page.addGroup')),
-            h('span', { key: 'spacer', style: { flex: '1 1 auto' } }),
+            h('span', { key: 'spacer', style: S.spacer }),
             h('button', {
               key: 'batchMode',
               type: 'button',
-              style: S.button,
+              className: 'sm-quiet',
+              style: S.textButtonStrong,
               disabled: skills.length === 0,
               onClick: toggleSelectionMode,
             }, t('page.batchMode')),
             h('button', {
               key: 'collapseAll',
               type: 'button',
-              style: S.button,
+              className: 'sm-quiet',
+              style: S.textButton,
               disabled: sectionKeys.length === 0,
               onClick: () => {
                 if (allCollapsed) {
@@ -1500,40 +1530,33 @@ window.__ModuleLoader__.load({
             }, allCollapsed ? t('page.expandAll') : t('page.collapseAll')),
           ])
 
-        const notices = []
-        if (error !== '') notices.push(h('div', { key: 'error', style: S.banner }, error))
-        if (note !== '') notices.push(h('div', { key: 'note', style: S.note }, note))
+        const alerts = []
+        if (error !== '') alerts.push(h('div', { key: 'error', style: S.alert }, error))
+        if (note !== '') alerts.push(h('div', { key: 'note', style: S.noteLine }, note))
         if (stats !== null && stats.complete === false) {
-          notices.push(h('div', { key: 'incomplete', style: S.notice }, t('page.incomplete')))
+          alerts.push(h('div', { key: 'incomplete', style: S.noteLine }, t('page.incomplete')))
         }
         if (stats !== null && stats.liveAgents === 0) {
-          notices.push(h('div', { key: 'noagent', style: S.notice }, t('page.noAgent')))
+          alerts.push(h('div', { key: 'noagent', style: S.noteLine }, t('page.noAgent')))
         }
 
         let body
         if (status === 'loading' && data === null) {
-          body = [h('div', { key: 'loading', style: Object.assign({}, S.muted, { marginTop: 24 }) }, t('page.loading'))]
+          body = [h('div', { key: 'loading', style: S.emptyState }, t('page.loading'))]
         } else if (status === 'error' && data === null) {
-          body = [h('div', { key: 'failed', style: { marginTop: 20 } }, [
-            h('button', {
-              key: 'retry',
-              type: 'button',
-              style: S.button,
-              onClick: () => load(),
-            }, t('page.retry')),
+          body = [h('div', { key: 'failed', style: S.emptyAction }, [
+            h('button', { key: 'retry', type: 'button', style: S.primary, onClick: () => load() }, t('page.retry')),
           ])]
         } else if (skills.length === 0) {
-          body = [h('div', { key: 'empty', style: Object.assign({}, S.muted, { marginTop: 24 }) }, t('page.empty'))]
+          body = [h('div', { key: 'empty', style: S.emptyState }, t('page.empty'))]
         } else if (visibleSkills.length === 0) {
-          body = [h('div', {
-            key: 'nomatch',
-            style: { marginTop: 24, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
-          }, [
-            h('span', { key: 'text', style: S.muted }, t('page.noMatch')),
+          body = [h('div', { key: 'nomatch', style: S.emptyState }, [
+            h('span', { key: 'text', style: { marginRight: 10 } }, t('page.noMatch')),
             h('button', {
               key: 'clear',
               type: 'button',
-              style: S.button,
+              className: 'sm-quiet',
+              style: S.textButton,
               onClick: clearFilters,
             }, t('page.clearFilters')),
           ])]
@@ -1546,9 +1569,11 @@ window.__ModuleLoader__.load({
           : t('page.footer')
         const footer = h('div', { key: 'footer', style: S.footer }, footerText)
 
-        const children = [header, filters, selectionToolbar, normalToolbar]
-          .filter((node) => node !== null)
-          .concat(notices, body, [footer])
+        const children = [masthead, h('div', { key: 'rule1', style: S.rule }), searchRow, h('div', { key: 'rule2', style: S.rule })]
+        if (normalActions !== null) children.push(normalActions)
+        if (selectionStrip !== null) children.push(selectionStrip)
+        if (alerts.length > 0) children.push(h('div', { key: 'alerts', style: S.alerts }, alerts))
+        children.push(...body, footer)
 
         return h('div', { className: 'sm-panel', style: S.page }, [
           h('style', { key: 'sm-style' }, STYLE_TEXT),

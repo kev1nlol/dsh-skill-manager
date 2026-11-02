@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-11-02
+
+### Changed
+
+- **Redesigned against the Anthropic `frontend-design` brief: a registry
+  index, not a card gallery.** Structure comes from a fixed order column and
+  hairline table rules; groups are open sections, and the page has no cards,
+  shadows, or pills.
+- Typography: one host family, three sizes, tabular numerals for counts and
+  order indices, and monospace only for the skill identifier.
+- Colour is a state signal: neutral chrome, brand for the active filter, batch
+  mode and focus ring, status dots for on/off.
+- Counts read as a sentence instead of three stat boxes; filters are underlined
+  tabs, not chips; batch mode marks itself with a 2px top rule on the action
+  strip.
+- Rows lost their boxes: a quiet group picker outlines on hover, and the
+  description is one line with the full text in its tooltip.
+- Copy rewritten for plain verbs and actionable empty/error states; motion is
+  limited to hover and state feedback and respects `prefers-reduced-motion`.
+
 ## [1.5.0] - 2026-11-02
 
 ### Changed
