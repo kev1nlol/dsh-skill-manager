@@ -8,11 +8,12 @@ window.__ModuleLoader__.load({
     const PANEL_ID = 'skill-manager'
     const STATE_URL = '/skill-manager/api/state'
     const ACTION_URL = '/skill-manager/api/action'
+    const COLLAPSE_KEY = 'dsh:skill-manager:collapsed'
 
     const ZH = {
       'nav.title': 'SKILL 管理',
       'page.title': 'SKILL 管理',
-      'page.subtitle': '给技能分组、启用或关闭技能。关闭后技能文件保留，但不会再出现在技能目录与 / 指令里。',
+      'page.subtitle': '给技能分组、批量或逐个启用关闭。关闭后技能文件保留，但不会再出现在技能目录与 / 指令里。',
       'page.refresh': '刷新',
       'page.loading': '正在读取技能…',
       'page.empty': '还没有发现任何技能。',
@@ -35,16 +36,34 @@ window.__ModuleLoader__.load({
       'page.errorFetch': '无法连接宿主服务。',
       'page.hintFetch': '请通过 Web 界面的 http 地址打开本页并刷新；如果仍然失败，请查看 Harness 日志。',
       'page.retry': '重试',
-      'page.groupHint': '删除分组不会删除技能，组内技能会回到未分组。',
       'page.incomplete': '目录扫描不完整，结果可能有遗漏。',
       'page.noAgent': '当前没有活动会话，技能来源可能列不全。',
       'page.savedTo': '状态文件',
+      'page.selectOne': '选择此技能',
+      'page.selectSection': '选择本节全部技能',
+      'page.selected': '已选',
+      'page.batchEnable': '批量启用',
+      'page.batchDisable': '批量关闭',
+      'page.batchMove': '移动到分组…',
+      'page.batchUngroup': '移出分组',
+      'page.batchClear': '取消选择',
+      'page.collapse': '折叠',
+      'page.expand': '展开',
+      'page.collapseAll': '全部折叠',
+      'page.expandAll': '全部展开',
+      'page.rename': '重命名',
+      'page.renameSave': '保存',
+      'page.renameCancel': '取消',
+      'page.renamePlaceholder': '分组名称',
+      'page.dragHint': '拖动排序',
+      'page.applied': '已应用',
+      'page.skipped': '跳过',
     }
 
     const EN = {
       'nav.title': 'SKILL Manager',
       'page.title': 'SKILL Manager',
-      'page.subtitle': 'Group skills and turn them on or off. A skill turned off keeps its files but leaves the skill catalog and the / skill commands.',
+      'page.subtitle': 'Group skills and turn them on or off one by one or in bulk. A skill turned off keeps its files but leaves the skill catalog and the / skill commands.',
       'page.refresh': 'Refresh',
       'page.loading': 'Reading skills…',
       'page.empty': 'No skills were discovered yet.',
@@ -67,10 +86,28 @@ window.__ModuleLoader__.load({
       'page.errorFetch': 'Cannot reach the host service.',
       'page.hintFetch': 'Open this page through the Web GUI http address and reload; if it still fails, check the Harness log.',
       'page.retry': 'Retry',
-      'page.groupHint': 'Deleting a group never deletes skills; its members move back to ungrouped.',
       'page.incomplete': 'Catalog discovery was incomplete, so this list may miss skills.',
       'page.noAgent': 'No live session right now, so skill sources may be incomplete.',
       'page.savedTo': 'State file',
+      'page.selectOne': 'Select this skill',
+      'page.selectSection': 'Select every skill in this section',
+      'page.selected': 'selected',
+      'page.batchEnable': 'Enable selected',
+      'page.batchDisable': 'Disable selected',
+      'page.batchMove': 'Move to group…',
+      'page.batchUngroup': 'Remove from group',
+      'page.batchClear': 'Clear selection',
+      'page.collapse': 'Collapse',
+      'page.expand': 'Expand',
+      'page.collapseAll': 'Collapse all',
+      'page.expandAll': 'Expand all',
+      'page.rename': 'Rename',
+      'page.renameSave': 'Save',
+      'page.renameCancel': 'Cancel',
+      'page.renamePlaceholder': 'Group name',
+      'page.dragHint': 'Drag to reorder',
+      'page.applied': 'Applied to',
+      'page.skipped': 'skipped',
     }
 
     const S = {
@@ -159,6 +196,19 @@ window.__ModuleLoader__.load({
         fontSize: 12,
         outline: 'none',
       },
+      renameInput: {
+        height: 24,
+        width: 180,
+        boxSizing: 'border-box',
+        padding: '0 8px',
+        borderRadius: 6,
+        border: '1px solid var(--dsw-alias-brand-primary)',
+        background: 'var(--dsw-alias-bg-layer-1)',
+        color: 'var(--dsw-alias-label-primary)',
+        font: 'inherit',
+        fontSize: 13,
+        outline: 'none',
+      },
       toolbar: { display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 20, alignItems: 'center' },
       banner: {
         marginTop: 16,
@@ -181,8 +231,38 @@ window.__ModuleLoader__.load({
         fontSize: 12,
         lineHeight: '18px',
       },
+      note: {
+        marginTop: 14,
+        padding: '8px 12px',
+        borderRadius: 8,
+        border: '1px solid var(--dsw-alias-state-success-primary)',
+        color: 'var(--dsw-alias-state-success-primary)',
+        fontSize: 12,
+        lineHeight: '18px',
+      },
+      batchBar: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        gap: 8,
+        marginTop: 16,
+        padding: '10px 12px',
+        borderRadius: 8,
+        border: '1px solid var(--dsw-alias-brand-primary)',
+        background: 'var(--dsw-alias-bg-layer-1)',
+      },
+      batchCount: { fontSize: 12, fontWeight: 600, color: 'var(--dsw-alias-brand-primary)' },
       section: { marginTop: 22 },
-      sectionHead: { display: 'flex', alignItems: 'center', gap: 8, padding: '0 2px 8px' },
+      sectionHead: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        padding: '4px 2px 8px',
+        borderRadius: 8,
+      },
+      sectionHeadDrop: {
+        boxShadow: 'inset 0 2px 0 0 var(--dsw-alias-brand-primary)',
+      },
       sectionTitle: { fontSize: 13, fontWeight: 600, color: 'var(--dsw-alias-label-primary)' },
       sectionCount: { fontSize: 12, color: 'var(--dsw-alias-label-secondary)' },
       sectionHint: {
@@ -191,6 +271,37 @@ window.__ModuleLoader__.load({
         color: 'var(--dsw-alias-label-secondary)',
         textAlign: 'right',
         flex: '0 1 auto',
+      },
+      chevron: {
+        width: 18,
+        height: 18,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: 'none',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-secondary)',
+        cursor: 'pointer',
+        padding: 0,
+        fontSize: 10,
+        flex: '0 0 auto',
+      },
+      handle: {
+        cursor: 'grab',
+        color: 'var(--dsw-alias-label-secondary)',
+        fontSize: 12,
+        lineHeight: '16px',
+        userSelect: 'none',
+        padding: '0 2px',
+        flex: '0 0 auto',
+      },
+      checkbox: {
+        width: 14,
+        height: 14,
+        margin: 0,
+        accentColor: 'var(--dsw-alias-brand-primary)',
+        cursor: 'pointer',
+        flex: '0 0 auto',
       },
       card: {
         border: '1px solid var(--dsw-alias-border-l1)',
@@ -310,6 +421,24 @@ window.__ModuleLoader__.load({
       return payload
     }
 
+    function readCollapsed() {
+      try {
+        const parsed = JSON.parse(window.localStorage.getItem(COLLAPSE_KEY) ?? '[]')
+        if (!Array.isArray(parsed)) return new Set()
+        return new Set(parsed.filter((entry) => typeof entry === 'string'))
+      } catch {
+        return new Set()
+      }
+    }
+
+    function writeCollapsed(collapsed) {
+      try {
+        window.localStorage.setItem(COLLAPSE_KEY, JSON.stringify([...collapsed]))
+      } catch {
+        // Blocked storage must never break the panel.
+      }
+    }
+
     function Badge(props) {
       return h('span', { style: props.warn === true ? S.badgeWarn : S.badge }, props.children)
     }
@@ -363,8 +492,9 @@ window.__ModuleLoader__.load({
 
     function SkillRow(props) {
       const t = props.t
+      const ui = props.ui
       const skill = props.skill
-      const busy = props.busy === true
+      const busy = ui.pending !== ''
       const title = [h('span', { key: 'name', style: S.skillName }, skill.name)]
       if (typeof skill.source === 'string' && skill.source !== '') {
         title.push(h(Badge, { key: 'source' }, skill.source))
@@ -373,6 +503,15 @@ window.__ModuleLoader__.load({
         title.push(h(Badge, { key: 'missing', warn: true }, t('page.missing')))
       }
       const children = [
+        h('input', {
+          key: 'check',
+          type: 'checkbox',
+          checked: ui.selected.has(skill.name),
+          disabled: busy,
+          'aria-label': t('page.selectOne'),
+          onChange: () => ui.onSelectSkill(skill.name),
+          style: S.checkbox,
+        }),
         h('div', { key: 'main', style: S.rowMain }, [
           h('div', { key: 'title', style: S.rowTitle }, title),
           typeof skill.description === 'string' && skill.description !== ''
@@ -382,20 +521,20 @@ window.__ModuleLoader__.load({
         h('select', {
           key: 'group',
           value: typeof skill.groupId === 'string' ? skill.groupId : '',
-          disabled: busy || props.groups.length === 0,
-          onChange: (event) => props.onAssign(skill.name, event.target.value),
+          disabled: busy || ui.groups.length === 0,
+          onChange: (event) => ui.onAssignSkill(skill.name, event.target.value),
           style: S.select,
           title: t('page.groupPicker'),
           'aria-label': t('page.groupPicker'),
         }, [h('option', { key: '', value: '' }, t('page.ungrouped'))].concat(
-          props.groups.map((group) => h('option', { key: group.id, value: group.id }, group.name)),
+          ui.groups.map((group) => h('option', { key: group.id, value: group.id }, group.name)),
         )),
         h(Toggle, {
           key: 'toggle',
           t,
           on: skill.enabled,
           disabled: busy,
-          onClick: () => props.onToggle(skill),
+          onClick: () => ui.onToggleSkill(skill),
         }),
       ]
       return h('div', { style: props.first === true ? S.row : Object.assign({}, S.row, S.rowDivider) }, children)
@@ -403,47 +542,148 @@ window.__ModuleLoader__.load({
 
     function GroupSection(props) {
       const t = props.t
-      const head = [
-        h('span', { key: 'title', style: S.sectionTitle }, props.title),
-        h('span', { key: 'count', style: S.sectionCount }, String(props.skills.length)),
-      ]
-      if (props.group !== null && props.group !== undefined) {
-        const confirming = props.confirming === props.group.id
-        head.push(h('span', { key: 'spacer', style: { flex: '1 1 auto' } }))
-        // Name the target and the consequence on the control itself: deleting a
-        // group only drops the label, never the skills inside it.
-        if (confirming) {
-          head.push(h('span', { key: 'hint', style: S.sectionHint }, t('page.deleteHint')))
-          head.push(h('button', {
-            key: 'cancel',
-            type: 'button',
-            style: S.buttonQuiet,
-            onClick: () => props.onCancelDelete(),
-          }, t('page.cancel')))
-        }
+      const ui = props.ui
+      const group = props.group
+      const skills = props.skills
+      const sectionKey = group === null ? 'ungrouped' : group.id
+      const collapsed = ui.collapsed.has(sectionKey)
+      const renaming = group !== null && ui.renaming !== null && ui.renaming.id === group.id
+      const confirming = group !== null && ui.confirming === group.id
+      const dropTarget = group !== null && ui.dragOver === group.id
+      const dragging = group !== null && ui.dragId === group.id
+      const allSelected = skills.length > 0 && skills.every((skill) => ui.selected.has(skill.name))
+
+      const head = []
+      if (group !== null) {
+        head.push(h('span', {
+          key: 'handle',
+          draggable: true,
+          title: t('page.dragHint'),
+          'aria-label': t('page.dragHint'),
+          onDragStart: (event) => {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', group.id)
+            ui.onDragStart(group.id)
+          },
+          onDragEnd: () => ui.onDragEnd(),
+          style: S.handle,
+        }, '⠿'))
+      }
+      head.push(h('button', {
+        key: 'chevron',
+        type: 'button',
+        'aria-expanded': collapsed ? 'false' : 'true',
+        'aria-label': collapsed ? t('page.expand') : t('page.collapse'),
+        title: collapsed ? t('page.expand') : t('page.collapse'),
+        onClick: () => ui.onToggleCollapse(sectionKey),
+        style: S.chevron,
+      }, collapsed ? '▸' : '▾'))
+      head.push(h('input', {
+        key: 'selectSect',
+        type: 'checkbox',
+        checked: allSelected,
+        disabled: skills.length === 0 || ui.pending !== '',
+        'aria-label': t('page.selectSection'),
+        onChange: () => ui.onSelectSection(sectionKey),
+        style: S.checkbox,
+      }))
+
+      if (renaming) {
+        head.push(h('input', {
+          key: 'rename',
+          value: ui.renaming.draft,
+          autoFocus: true,
+          maxLength: 40,
+          placeholder: t('page.renamePlaceholder'),
+          'aria-label': t('page.renamePlaceholder'),
+          onChange: (event) => ui.onRenameDraft(event.target.value),
+          onKeyDown: (event) => {
+            if (event.key === 'Enter') ui.onSaveRename()
+            else if (event.key === 'Escape') ui.onCancelRename()
+          },
+          style: S.renameInput,
+        }))
         head.push(h('button', {
-          key: 'delete',
+          key: 'renameSave',
           type: 'button',
           style: S.buttonQuiet,
-          title: t('page.deleteHint'),
-          onClick: () => props.onDelete(props.group, confirming),
-        }, confirming ? t('page.confirmDeleteGroup') : t('page.deleteGroup')))
+          onClick: () => ui.onSaveRename(),
+        }, t('page.renameSave')))
+        head.push(h('button', {
+          key: 'renameCancel',
+          type: 'button',
+          style: S.buttonQuiet,
+          onClick: () => ui.onCancelRename(),
+        }, t('page.renameCancel')))
+      } else {
+        head.push(h('span', { key: 'title', style: S.sectionTitle }, group === null ? t('page.ungrouped') : group.name))
+        head.push(h('span', { key: 'count', style: S.sectionCount }, String(skills.length)))
+        head.push(h('span', { key: 'spacer', style: { flex: '1 1 auto' } }))
+        if (group !== null) {
+          if (confirming) {
+            head.push(h('span', { key: 'hint', style: S.sectionHint }, t('page.deleteHint')))
+            head.push(h('button', {
+              key: 'cancelDelete',
+              type: 'button',
+              style: S.buttonQuiet,
+              onClick: () => ui.onCancelDelete(),
+            }, t('page.cancel')))
+          }
+          head.push(h('button', {
+            key: 'renameBtn',
+            type: 'button',
+            style: S.buttonQuiet,
+            title: t('page.rename'),
+            onClick: () => ui.onStartRename(group),
+          }, t('page.rename')))
+          head.push(h('button', {
+            key: 'delete',
+            type: 'button',
+            style: S.buttonQuiet,
+            title: t('page.deleteHint'),
+            onClick: () => ui.onDeleteGroup(group, confirming),
+          }, confirming ? t('page.confirmDeleteGroup') : t('page.deleteGroup')))
+        }
       }
-      const rows = props.skills.length === 0
-        ? [h('div', { key: 'empty', style: S.emptyRow }, t('page.emptyGroup'))]
-        : props.skills.map((skill, index) => h(SkillRow, {
-          key: skill.name,
-          t,
-          skill,
-          groups: props.groups,
-          busy: props.pending === `toggle:${skill.name}` || props.pending === `assign:${skill.name}`,
-          first: index === 0,
-          onToggle: props.onToggle,
-          onAssign: props.onAssign,
-        }))
-      return h('section', { style: S.section }, [
-        h('div', { key: 'head', style: S.sectionHead }, head),
-        h('div', { key: 'body', style: S.card }, rows),
+
+      const body = collapsed
+        ? []
+        : [skills.length === 0
+          ? h('div', { key: 'empty', style: S.emptyRow }, t('page.emptyGroup'))
+          : skills.map((skill, index) => h(SkillRow, {
+            key: skill.name,
+            t,
+            ui,
+            skill,
+            first: index === 0,
+          }))]
+
+      const headStyle = dropTarget ? Object.assign({}, S.sectionHead, S.sectionHeadDrop) : S.sectionHead
+      return h('section', {
+        style: Object.assign({}, S.section, dragging ? { opacity: 0.55 } : {}),
+        onDragOver: group !== null
+          ? (event) => {
+            if (ui.dragId === null) return
+            event.preventDefault()
+            event.dataTransfer.dropEffect = 'move'
+            ui.onDragOver(group.id)
+          }
+          : undefined,
+        onDragLeave: group !== null
+          ? (event) => {
+            if (event.currentTarget.contains(event.relatedTarget)) return
+            ui.onDragOver(null)
+          }
+          : undefined,
+        onDrop: group !== null
+          ? (event) => {
+            event.preventDefault()
+            ui.onDrop(group.id)
+          }
+          : undefined,
+      }, [
+        h('div', { key: 'head', style: headStyle }, head),
+        collapsed ? null : h('div', { key: 'body', style: S.card }, body),
       ])
     }
 
@@ -452,18 +692,48 @@ window.__ModuleLoader__.load({
         const [data, setData] = React.useState(null)
         const [status, setStatus] = React.useState('loading')
         const [error, setError] = React.useState('')
+        const [note, setNote] = React.useState('')
         const [pending, setPending] = React.useState('')
         const [draftGroup, setDraftGroup] = React.useState('')
         const [confirmGroup, setConfirmGroup] = React.useState('')
+        const [renaming, setRenaming] = React.useState(null)
+        const [collapsed, setCollapsed] = React.useState(() => readCollapsed())
+        const [selected, setSelected] = React.useState(() => new Set())
+        const [dragId, setDragId] = React.useState(null)
+        const [dragOver, setDragOver] = React.useState(null)
         const alive = React.useRef(true)
+        const dragging = React.useRef(null)
 
         React.useEffect(() => () => {
           alive.current = false
         }, [])
 
+        React.useEffect(() => {
+          writeCollapsed(collapsed)
+        }, [collapsed])
+
+        React.useEffect(() => {
+          if (note === '') return undefined
+          const timer = setTimeout(() => setNote(''), 4000)
+          return () => clearTimeout(timer)
+        }, [note])
+
         const fail = React.useCallback((failure) => {
           const network = failure !== null && typeof failure === 'object' && failure.network === true
           setError(network ? `${t('page.errorFetch')} ${t('page.hintFetch')}` : messageOf(failure))
+        }, [])
+
+        const pruneSelection = React.useCallback((payload) => {
+          const names = new Set((payload.skills ?? []).map((skill) => skill.name))
+          setSelected((previous) => {
+            let dropped = false
+            const next = new Set()
+            for (const name of previous) {
+              if (names.has(name)) next.add(name)
+              else dropped = true
+            }
+            return dropped ? next : previous
+          })
         }, [])
 
         const load = React.useCallback(async () => {
@@ -474,12 +744,13 @@ window.__ModuleLoader__.load({
             if (!alive.current) return
             setData(payload)
             setStatus('ready')
+            pruneSelection(payload)
           } catch (failure) {
             if (!alive.current) return
             fail(failure)
             setStatus('error')
           }
-        }, [fail])
+        }, [fail, pruneSelection])
 
         React.useEffect(() => {
           load()
@@ -490,52 +761,53 @@ window.__ModuleLoader__.load({
           setError('')
           try {
             const next = await request(ACTION_URL, payload)
-            if (!alive.current) return
+            if (!alive.current) return null
             setData(next)
             setStatus('ready')
-            return true
+            pruneSelection(next)
+            const result = next.result
+            if (result !== null && typeof result === 'object' && Array.isArray(result.applied)) {
+              const skipped = Array.isArray(result.skipped) ? result.skipped.length : 0
+              setNote(
+                `${t('page.applied')} ${result.applied.length}` +
+                  (skipped > 0 ? ` · ${t('page.skipped')} ${skipped}` : ''),
+              )
+            }
+            return next
           } catch (failure) {
             if (alive.current) fail(failure)
-            return false
+            return null
           } finally {
             if (alive.current) setPending('')
           }
-        }, [fail])
+        }, [fail, pruneSelection])
 
-        const onToggle = React.useCallback((skill) => {
+        const onToggleSkill = React.useCallback((skill) => {
           act({ action: skill.enabled ? 'disable' : 'enable', name: skill.name }, `toggle:${skill.name}`)
         }, [act])
 
-        const onAssign = React.useCallback((name, groupId) => {
-          // The picker's option value is the group id. Clearing sends an empty
-          // group string, which the host reads as "move back to ungrouped".
-          const payload = groupId === ''
-            ? { action: 'assign', name, group: '', group_id: '' }
-            : { action: 'assign', name, group_id: groupId }
-          act(payload, `assign:${name}`)
+        const onAssignSkill = React.useCallback((name, groupId) => {
+          act(
+            groupId === ''
+              ? { action: 'assign', name, group: '', group_id: '' }
+              : { action: 'assign', name, group_id: groupId },
+            `assign:${name}`,
+          )
         }, [act])
 
-        const onCreateGroup = React.useCallback(async () => {
-          const name = draftGroup.trim()
-          if (name === '') return
-          const changed = await act({ action: 'create_group', group: name }, 'group:create')
-          if (changed && alive.current) setDraftGroup('')
-        }, [act, draftGroup])
-
-        const onDeleteGroup = React.useCallback(async (group, confirming) => {
-          if (confirming) {
-            const changed = await act({ action: 'delete_group', group_id: group.id }, `group:delete:${group.id}`)
-            if (changed && alive.current) setConfirmGroup('')
-            return
-          }
-          setConfirmGroup(group.id)
-        }, [act])
+        const onSelectSkill = React.useCallback((name) => {
+          setSelected((previous) => {
+            const next = new Set(previous)
+            if (next.has(name)) next.delete(name)
+            else next.add(name)
+            return next
+          })
+        }, [])
 
         const groups = data !== null && Array.isArray(data.groups) ? data.groups : []
         const skills = data !== null && Array.isArray(data.skills) ? data.skills : []
         const stats = data !== null && data.stats !== null && typeof data.stats === 'object' ? data.stats : null
 
-        const sections = []
         const byGroup = new Map()
         for (const group of groups) byGroup.set(group.id, [])
         const ungrouped = []
@@ -543,42 +815,156 @@ window.__ModuleLoader__.load({
           if (typeof skill.groupId === 'string' && byGroup.has(skill.groupId)) byGroup.get(skill.groupId).push(skill)
           else ungrouped.push(skill)
         }
-        // An empty Ungrouped section is pure noise once every skill lives in a
-        // group, so it appears only while it actually holds something. A named
-        // group stays visible when empty: that is where a freshly created group
-        // waits for its first member.
+
+        const onSelectSection = (sectionKey) => {
+          const inSection = skills.filter((skill) => (
+            sectionKey === 'ungrouped'
+              ? !(typeof skill.groupId === 'string' && byGroup.has(skill.groupId))
+              : skill.groupId === sectionKey
+          ))
+          setSelected((previous) => {
+            const next = new Set(previous)
+            const all = inSection.length > 0 && inSection.every((skill) => next.has(skill.name))
+            for (const skill of inSection) {
+              if (all) next.delete(skill.name)
+              else next.add(skill.name)
+            }
+            return next
+          })
+        }
+
+        const runBatch = React.useCallback(async (op, extra) => {
+          const names = [...selected]
+          if (names.length === 0) return
+          const next = await act(Object.assign({ action: 'batch', op, names }, extra ?? {}), 'batch')
+          if (next !== null && alive.current) setSelected(new Set())
+        }, [act, selected])
+
+        const onBatchMove = (groupId) => {
+          if (groupId === '') return
+          runBatch('assign', { group_id: groupId })
+        }
+
+        const onCreateGroup = React.useCallback(async () => {
+          const name = draftGroup.trim()
+          if (name === '') return
+          const next = await act({ action: 'create_group', group: name }, 'group:create')
+          if (next !== null && alive.current) setDraftGroup('')
+        }, [act, draftGroup])
+
+        const onDeleteGroup = React.useCallback(async (group, confirming) => {
+          if (!confirming) {
+            setConfirmGroup(group.id)
+            return
+          }
+          setConfirmGroup('')
+          const next = await act({ action: 'delete_group', group_id: group.id }, `group:delete:${group.id}`)
+          if (next !== null && alive.current) {
+            setCollapsed((previous) => {
+              if (!previous.has(group.id)) return previous
+              const copy = new Set(previous)
+              copy.delete(group.id)
+              return copy
+            })
+          }
+        }, [act])
+
+        const onStartRename = (group) => setRenaming({ id: group.id, draft: group.name })
+
+        const onRenameDraft = (draft) => {
+          setRenaming((current) => (current === null ? current : { id: current.id, draft }))
+        }
+
+        const onCancelRename = () => setRenaming(null)
+
+        const onSaveRename = React.useCallback(async () => {
+          if (renaming === null) return
+          const name = renaming.draft.trim()
+          if (name === '') return
+          const next = await act({ action: 'rename_group', group_id: renaming.id, to: name }, 'group:rename')
+          if (next !== null && alive.current) setRenaming(null)
+        }, [act, renaming])
+
+        const onToggleCollapse = React.useCallback((sectionKey) => {
+          setCollapsed((previous) => {
+            const next = new Set(previous)
+            if (next.has(sectionKey)) next.delete(sectionKey)
+            else next.add(sectionKey)
+            return next
+          })
+        }, [])
+
+        const onDragStart = (groupId) => {
+          dragging.current = groupId
+          setDragId(groupId)
+          setDragOver(null)
+        }
+
+        const onDragOver = (groupId) => setDragOver(groupId)
+
+        const onDragEnd = React.useCallback(() => {
+          dragging.current = null
+          setDragId(null)
+          setDragOver(null)
+        }, [])
+
+        const onDrop = (targetId) => {
+          const source = dragging.current
+          onDragEnd()
+          if (source === null || source === targetId) return
+          const ids = groups.map((group) => group.id)
+          const from = ids.indexOf(source)
+          const to = ids.indexOf(targetId)
+          if (from < 0 || to < 0) return
+          const ordered = ids.slice()
+          ordered.splice(from, 1)
+          ordered.splice(to, 0, source)
+          act({ action: 'reorder_groups', ids: ordered }, 'group:reorder')
+        }
+
+        const ui = {
+          t,
+          pending,
+          groups,
+          selected,
+          confirming: confirmGroup,
+          renaming,
+          collapsed,
+          dragId,
+          dragOver,
+          onToggleSkill,
+          onAssignSkill,
+          onSelectSkill,
+          onSelectSection,
+          onToggleCollapse,
+          onStartRename,
+          onRenameDraft,
+          onSaveRename,
+          onCancelRename,
+          onDeleteGroup,
+          onCancelDelete: () => setConfirmGroup(''),
+          onDragStart,
+          onDragOver,
+          onDragEnd,
+          onDrop,
+        }
+
+        const sections = []
         if (ungrouped.length > 0) {
-          sections.push(h(GroupSection, {
-            key: 'ungrouped',
-            t,
-            title: t('page.ungrouped'),
-            group: null,
-            groups,
-            skills: ungrouped,
-            pending,
-            confirming: confirmGroup,
-            onDelete: onDeleteGroup,
-            onCancelDelete: () => setConfirmGroup(''),
-            onToggle,
-            onAssign,
-          }))
+          sections.push(h(GroupSection, { key: 'ungrouped', t, ui, group: null, skills: ungrouped }))
         }
         for (const group of groups) {
           sections.push(h(GroupSection, {
             key: group.id,
             t,
-            title: group.name,
+            ui,
             group,
-            groups,
             skills: byGroup.get(group.id) ?? [],
-            pending,
-            confirming: confirmGroup,
-            onDelete: onDeleteGroup,
-            onCancelDelete: () => setConfirmGroup(''),
-            onToggle,
-            onAssign,
           }))
         }
+
+        const allCollapsed = groups.length > 0 && groups.every((group) => collapsed.has(group.id)) &&
+          (ungrouped.length === 0 || collapsed.has('ungrouped'))
 
         const header = h('header', { style: S.header }, [
           h('div', { key: 'titles', style: { minWidth: 0 } }, [
@@ -593,16 +979,15 @@ window.__ModuleLoader__.load({
           h('button', {
             key: 'refresh',
             type: 'button',
-            style: Object.assign({}, S.button, { opacity: status === 'loading' ? 0.6 : 1 }),
-            disabled: status === 'loading',
+            style: Object.assign({}, S.button, { opacity: status === 'loading' || pending !== '' ? 0.6 : 1 }),
+            disabled: status === 'loading' || pending !== '',
             onClick: () => load(),
           }, t('page.refresh')),
         ])
 
         const notices = []
-        if (error !== '') {
-          notices.push(h('div', { key: 'error', style: S.banner }, error))
-        }
+        if (error !== '') notices.push(h('div', { key: 'error', style: S.banner }, error))
+        if (note !== '') notices.push(h('div', { key: 'note', style: S.note }, note))
         if (stats !== null && stats.complete === false) {
           notices.push(h('div', { key: 'incomplete', style: S.notice }, t('page.incomplete')))
         }
@@ -633,6 +1018,66 @@ window.__ModuleLoader__.load({
             disabled: draftGroup.trim() === '' || pending === 'group:create',
             onClick: onCreateGroup,
           }, t('page.addGroup')),
+          h('span', { key: 'spacer', style: { flex: '1 1 auto' } }),
+          h('button', {
+            key: 'collapseAll',
+            type: 'button',
+            style: S.button,
+            disabled: groups.length === 0 && ungrouped.length === 0,
+            onClick: () => {
+              if (allCollapsed) {
+                setCollapsed(new Set())
+                return
+              }
+              const next = new Set()
+              for (const group of groups) next.add(group.id)
+              if (ungrouped.length > 0) next.add('ungrouped')
+              setCollapsed(next)
+            },
+          }, allCollapsed ? t('page.expandAll') : t('page.collapseAll')),
+        ])
+
+        const batchBar = selected.size === 0 ? null : h('div', { style: S.batchBar }, [
+          h('span', { key: 'count', style: S.batchCount }, `${t('page.selected')} ${selected.size}`),
+          h('button', {
+            key: 'enable',
+            type: 'button',
+            style: S.button,
+            disabled: pending !== '',
+            onClick: () => runBatch('enable'),
+          }, t('page.batchEnable')),
+          h('button', {
+            key: 'disable',
+            type: 'button',
+            style: S.button,
+            disabled: pending !== '',
+            onClick: () => runBatch('disable'),
+          }, t('page.batchDisable')),
+          h('select', {
+            key: 'move',
+            value: '',
+            disabled: pending !== '' || groups.length === 0,
+            'aria-label': t('page.batchMove'),
+            title: t('page.batchMove'),
+            style: S.select,
+            onChange: (event) => onBatchMove(event.target.value),
+          }, [h('option', { key: '', value: '' }, t('page.batchMove'))].concat(
+            groups.map((group) => h('option', { key: group.id, value: group.id }, group.name)),
+          )),
+          h('button', {
+            key: 'ungroup',
+            type: 'button',
+            style: S.button,
+            disabled: pending !== '',
+            onClick: () => runBatch('ungroup'),
+          }, t('page.batchUngroup')),
+          h('span', { key: 'spacer', style: { flex: '1 1 auto' } }),
+          h('button', {
+            key: 'clear',
+            type: 'button',
+            style: S.buttonQuiet,
+            onClick: () => setSelected(new Set()),
+          }, t('page.batchClear')),
         ])
 
         const body = status === 'loading' && data === null
@@ -655,7 +1100,9 @@ window.__ModuleLoader__.load({
           : t('page.footer')
         const footer = h('div', { style: S.footer }, footerText)
 
-        return h('div', { style: S.page }, h('div', { style: S.inner }, [header, toolbar].concat(notices, body, [footer])))
+        const top = [header, toolbar]
+        if (batchBar !== null) top.push(batchBar)
+        return h('div', { style: S.page }, h('div', { style: S.inner }, top.concat(notices, body, [footer])))
       }
     }
 

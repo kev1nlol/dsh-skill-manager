@@ -17,6 +17,9 @@ Harness 的技能来自很多地方（内置包、`~/.dsh/skills`、项目目录
 ## 功能
 
 - **侧栏入口**：左栏出现 `SKILL 管理` 图标（order 15），点开是完整的主面板。
+- **分组真好管**：每个分组可**重命名**；拖住分组左侧的 `⠿` 手柄即可调整分组顺序，顺序会持久化。
+- **批量操作**：勾选技能（每节还支持全选）后，可批量启用 / 批量关闭 / 批量移入分组 / 批量移出分组。
+- **折叠 / 展开**：每个分组标题都能折叠，另有「全部折叠 / 全部展开」；折叠状态记在浏览器本地。
 - **分组只是整理**：分组名存在 Harness 配置目录下的 JSON 里，不参与发现、索引、加载。删除分组只删标签——组内技能回到「未分组」，技能本身不受任何影响。
 - **开关是真的**：关闭某个技能时，插件会在每个活动 Agent 自己的作用域里注册一个遮蔽 provider，对该名字报 `invocation: { modelInvocable: false, userInvocable: false }`。所有按 Agent 解析技能的消费方因此不再展示、不再加载它；下一个 `agent/pre-step` 会追加一份替换目录，模型立刻知道变化。
 - **不碰技能文件**：不编辑、不移动、不删除 `SKILL.md`；重新打开只是撤掉遮蔽。
@@ -61,7 +64,10 @@ plugin_manager install_bundle → D:\path\to\dsh-skill-manager
 2. 顶部输入框建分组（例如 `个人安装`、`官方内置`）；
 3. 用每行右侧的下拉把技能移入分组，或移回「未分组」；
 4. 用每行最右侧的开关停止 / 恢复索引，徽标与顶部计数立刻更新；
-5. 鼠标停在分组的删除按钮上会说明后果：只删分组。
+5. 勾选多个技能（或点分组标题前的复选框整节选择），顶部出现批量条：启用 / 关闭 / 移到分组 / 移出分组；
+6. 分组标题右侧可「重命名」「删除分组」；删除只删分组（悬停有说明）；
+7. 点标题前的 `▾` / `▸` 折叠或展开该分组，「全部折叠 / 全部展开」在工具栏右侧；
+8. 拖动分组左侧的 `⠿` 手柄调整分组顺序。
 
 每次切换都会让模型的下一步拿到新的技能目录，被关闭的技能会从 `<available_skills>` 和该会话的 `/` 菜单里消失。
 
@@ -109,20 +115,24 @@ plugin_manager install_bundle → D:\path\to\dsh-skill-manager
 { "action": "enable",        "name": "office-pptx" }
 { "action": "disable",       "name": "office-pptx" }
 { "action": "create_group",  "group": "写作" }
+{ "action": "rename_group",  "group_id": "g-9a588124", "to": "官方技能" }
 { "action": "delete_group",  "group_id": "g-9a588124" }
 { "action": "assign",        "name": "office-docx", "group_id": "g-9a588124" }
+{ "action": "reorder_groups","ids": ["g-b", "g-a"] }
+{ "action": "batch",         "op": "disable", "names": ["office-pptx", "office-xlsx"] }
+{ "action": "batch",         "op": "assign",  "names": ["office-docx"], "group_id": "g-9a588124" }
 ```
 
-`group` 与 `group_id` 都接受分组名或分组 id；空串表示移回「未分组」。
+`group` 与 `group_id` 都接受分组名或分组 id；空串表示移回「未分组」。`batch` 的 `op` 取 `enable` / `disable` / `assign` / `ungroup`，结果里会附带 `applied` 与 `skipped`，未知技能名会被跳过而不是让整批失败。`reorder_groups` 必须把现有分组 id 恰好列全一次。
 
-同样的操作以 `skill_manager` 工具暴露给模型，`action` 取 `list` / `enable` / `disable` / `create_group` / `delete_group` / `assign`。
+同样的操作以 `skill_manager` 工具暴露给模型，`action` 取 `list` / `enable` / `disable` / `batch` / `create_group` / `rename_group` / `delete_group` / `assign` / `reorder_groups`。
 
 ## 说明与限制
 
 - **面板不删技能**：要移除技能请去来源处删（`~/.dsh/skills/<name>/`、安装它的 bundle 等）。
 - **冷会话**：没有活动 Agent 的会话，`/` 菜单可能走 preset 作用域的注册表，此时按 Agent 的遮蔽不生效；发一条消息激活 Agent 后，下一次取数即按开关过滤。
 - **同源请求**：面板调用页面同源的 `/skill-manager/...`。已在 http 服务的 Web GUI 中验证；从 `file://` 加载界面的外壳可能解析不到这些路由。
-- **没有拖拽**：用行内下拉框归组。
+- **技能不能拖拽归组**：分组本身可以拖 `⠿` 手柄排序；技能归组用行内下拉框或批量条。
 - **目录完整性**：某个 provider 发现不完整时，面板会提示，并展示最近一次可用结果。
 
 ## 开发
@@ -168,6 +178,9 @@ Harness skills come from many places (bundled packages, `~/.dsh/skills`, project
 ## Features
 
 - **Sidebar entry.** A `SKILL 管理` / `SKILL Manager` icon in the left rail (order 15) opens a full main panel.
+- **Groups that are easy to manage.** Rename a group in place, and drag the `⠿` handle on its left to reorder groups; the order is persisted.
+- **Batch operations.** Tick skills (or select a whole section) to enable, disable, move into a group, or remove from a group in one go.
+- **Collapse and expand.** Every group header collapses, plus a global collapse/expand control; the state is remembered in the browser.
 - **Groups are pure bookkeeping.** Names live in a JSON file next to your Harness home and never influence discovery, indexing, or loading. Deleting a group only drops the label: its members move back to *Ungrouped*, and no skill is removed or modified.
 - **On/off is real.** Turning a skill off publishes a scope-local shadow provider on every live Agent that reports `invocation: { modelInvocable: false, userInvocable: false }` for that name. All consumers that resolve skills for an Agent therefore stop advertising and loading it, and the next `agent/pre-step` publishes a replacement catalog so the model learns about the change immediately.
 - **Never touches skill files.** No `SKILL.md` is edited, moved, or deleted. Turning a skill back on simply withdraws the shadow.
@@ -214,7 +227,10 @@ If you prefer editing the profile patch yourself, add the bundle row:
 2. Create a group (for example `个人安装` or `Official`) with the input at the top.
 3. Use the group picker on any row to move that skill into a group, or back to *Ungrouped*.
 4. Use the on/off pill on the right of a row to stop or resume indexing that skill. The row badge and the counters at the top update immediately.
-5. Hover the delete control of a group to read what it does; it deletes only the group.
+5. Tick several skills (or the checkbox in a group header to select the whole section) and the batch bar appears: enable, disable, move to a group, or remove from a group.
+6. Rename or delete a group from its header; deleting only removes the group (hover for the explanation).
+7. Click `▾` / `▸` to collapse or expand a group, or use *Collapse all* / *Expand all* in the toolbar.
+8. Drag the `⠿` handle on a group header to reorder groups.
 
 The panel starts the model's next step with a fresh skill catalog whenever you toggle something, so a disabled skill disappears from the model's `<available_skills>` list and from the `/` menu for that session.
 
@@ -262,20 +278,24 @@ Host routes (same origin, loopback only):
 { "action": "enable",        "name": "office-pptx" }
 { "action": "disable",       "name": "office-pptx" }
 { "action": "create_group",  "group": "Writing" }
+{ "action": "rename_group",  "group_id": "g-9a588124", "to": "Official" }
 { "action": "delete_group",  "group_id": "g-9a588124" }
 { "action": "assign",        "name": "office-docx", "group_id": "g-9a588124" }
+{ "action": "reorder_groups","ids": ["g-b", "g-a"] }
+{ "action": "batch",         "op": "disable", "names": ["office-pptx", "office-xlsx"] }
+{ "action": "batch",         "op": "assign",  "names": ["office-docx"], "group_id": "g-9a588124" }
 ```
 
-`group` and `group_id` both accept either a group name or a group id; an empty string moves a skill back to *Ungrouped*.
+`group` and `group_id` both accept either a group name or a group id; an empty string moves a skill back to *Ungrouped*. `batch` takes `op` = `enable`, `disable`, `assign`, or `ungroup`, and reports `applied` / `skipped`; unknown skill names are skipped instead of failing the whole batch. `reorder_groups` must list every group id exactly once.
 
-The same operations are available to the model as the `skill_manager` tool with `action` = `list`, `enable`, `disable`, `create_group`, `delete_group`, or `assign`.
+The same operations are available to the model as the `skill_manager` tool with `action` = `list`, `enable`, `disable`, `batch`, `create_group`, `rename_group`, `delete_group`, `assign`, or `reorder_groups`.
 
 ## Notes and limitations
 
 - **Skill files are read-only here.** The panel deliberately offers no "delete skill"; remove the skill at its source (`~/.dsh/skills/<name>/`, the installing bundle, and so on).
 - **Cold sessions.** The `/` skill menu of a session that has no live Agent can be served from the preset-scope registry, where the per-Agent shadow does not apply. Sending one message activates the Agent and the filter applies from the next fetch.
 - **Same-origin fetch.** The panel calls `/skill-manager/...` on the page's own origin. It is verified in the Web GUI served over http; a shell that loads the UI from `file://` may not resolve these routes.
-- **No drag and drop.** Use the row's group picker.
+- **No skill drag and drop.** Group rows are reordered by dragging their `⠿` handle; to regroup a skill use its row picker or the batch bar.
 - **Catalog completeness.** If a provider's discovery is incomplete, the panel says so and shows the last usable view.
 
 ## Development

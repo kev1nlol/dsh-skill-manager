@@ -23,6 +23,8 @@ const STATE_ROUTE = '/skill-manager/api/state'
 const ACTION_ROUTE = '/skill-manager/api/action'
 const SHADOW_PROVIDER = 'skill-manager'
 const MAX_BODY_BYTES = 256 * 1024
+const MAX_BATCH = 500
+const BATCH_OPS = new Set(['enable', 'disable', 'assign', 'ungroup'])
 const SKILL_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const DISABLED_CONTENT = [
   'This skill is turned off in the SKILL Manager panel, so its instructions are not available.',
@@ -98,23 +100,43 @@ function createTool(ctx, store) {
       properties: {
         action: {
           type: 'string',
-          enum: ['list', 'enable', 'disable', 'create_group', 'delete_group', 'assign'],
+          enum: ['list', 'enable', 'disable', 'create_group', 'rename_group', 'delete_group', 'assign', 'batch', 'reorder_groups'],
           description:
-            'The operation: list skills, enable or disable one skill, create or delete a group, or assign a skill to a group.',
+            'The operation: list skills; enable or disable one skill; create, rename, reorder, or delete groups; ' +
+            'assign one skill; or batch-apply an operation to many skills.',
         },
         name: {
           type: 'string',
           description: 'Exact kebab-case skill name, required by enable, disable, and assign.',
         },
+        names: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Exact skill names for action "batch".',
+        },
+        op: {
+          type: 'string',
+          enum: ['enable', 'disable', 'assign', 'ungroup'],
+          description: 'Batch operation, required by action "batch".',
+        },
         group: {
           type: 'string',
           description:
-            'Group name: the new name for create_group, the target group for assign, or the group to delete when group_id is omitted. ' +
-            'assign with an empty string moves the skill back to ungrouped.',
+            'Group name: the new name for create_group, the target group for assign and batch assign, or the group to rename/delete ' +
+            'when group_id is omitted. assign or batch ungroup with an empty string moves skills back to ungrouped.',
         },
         group_id: {
           type: 'string',
-          description: 'Exact group id, used instead of the group name for delete_group.',
+          description: 'Exact group id; accepted anywhere a group is named.',
+        },
+        to: {
+          type: 'string',
+          description: 'New group name, required by rename_group.',
+        },
+        ids: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Ordered group ids for reorder_groups; must list every group exactly once.',
         },
       },
     },
@@ -431,6 +453,7 @@ async function runAction(ctx, store, input) {
   const action = typeof input?.action === 'string' ? input.action.trim() : ''
   const state = await ensureState(store)
   let changed = false
+  let result = null
   if (action === 'list') return buildPayload(ctx, store)
   if (action === 'enable' || action === 'disable') {
     const skillName = requireSkillName(input?.name)
@@ -449,6 +472,10 @@ async function runAction(ctx, store, input) {
       state.meta[skillName] = pickMeta(summary)
       changed = true
     }
+  } else if (action === 'batch') {
+    const batch = await applyBatch(ctx, store, state, input)
+    changed = batch.changed
+    result = batch.result
   } else if (action === 'create_group') {
     const groupName = requireGroupName(input?.group)
     if (state.groups.some((group) => group.name.toLowerCase() === groupName.toLowerCase())) {
@@ -456,6 +483,18 @@ async function runAction(ctx, store, input) {
     }
     state.groups.push({ id: `g-${randomUUID().slice(0, 8)}`, name: groupName })
     changed = true
+  } else if (action === 'rename_group') {
+    const groupId = resolveGroupId(state, input?.group_id, input?.group)
+    const nextName = requireGroupName(input?.to)
+    const duplicate = state.groups.find(
+      (group) => group.id !== groupId && group.name.toLowerCase() === nextName.toLowerCase(),
+    )
+    if (duplicate !== undefined) throw new Error(`a group named "${nextName}" already exists`)
+    const target = state.groups.find((group) => group.id === groupId)
+    if (target !== undefined && target.name !== nextName) {
+      target.name = nextName
+      changed = true
+    }
   } else if (action === 'delete_group') {
     const groupId = resolveGroupId(state, input?.group_id, input?.group)
     state.groups = state.groups.filter((group) => group.id !== groupId)
@@ -484,15 +523,95 @@ async function runAction(ctx, store, input) {
         changed = true
       }
     }
+  } else if (action === 'reorder_groups') {
+    changed = reorderGroups(state, input?.ids)
   } else {
-    throw new Error(`unknown action "${action}"; expected list, enable, disable, create_group, delete_group, or assign`)
+    throw new Error(
+      'unknown action "' + action + '"; expected list, enable, disable, batch, create_group, rename_group, ' +
+      'delete_group, assign, or reorder_groups',
+    )
   }
   if (changed) {
     await saveState(store.stateFile, state)
     store.state = state
     invalidateShadows(store)
   }
-  return buildPayload(ctx, store)
+  const payload = await buildPayload(ctx, store)
+  if (result !== null) payload.result = result
+  return payload
+}
+
+/**
+ * Apply one operation to many skills. Unknown or already-settled names are
+ * reported as skipped instead of failing the whole batch, so one stale name
+ * from a client selection cannot block the rest.
+ */
+async function applyBatch(ctx, store, state, input) {
+  const op = typeof input?.op === 'string' ? input.op.trim() : ''
+  if (!BATCH_OPS.has(op)) throw new Error('batch op must be enable, disable, assign, or ungroup')
+  const names = [...new Set(stringList(input?.names))].slice(0, MAX_BATCH)
+  if (names.length === 0) throw new Error('batch names must list at least one skill')
+  const invalid = names.filter((name) => !SKILL_NAME.test(name))
+  if (invalid.length > 0) throw new Error(`invalid skill names: ${invalid.slice(0, 5).join(', ')}`)
+  const catalog = await collectCatalog(ctx, store)
+  const groupId = op === 'assign' ? resolveGroupId(state, input?.group_id, input?.group) : null
+  const applied = []
+  const skipped = []
+  for (const skillName of names) {
+    if (!catalog.byName.has(skillName)) {
+      skipped.push(skillName)
+      continue
+    }
+    if (op === 'enable') {
+      if (!state.disabled.includes(skillName)) {
+        skipped.push(skillName)
+        continue
+      }
+      state.disabled = state.disabled.filter((entry) => entry !== skillName)
+      delete state.meta[skillName]
+      applied.push(skillName)
+    } else if (op === 'disable') {
+      if (state.disabled.includes(skillName)) {
+        skipped.push(skillName)
+        continue
+      }
+      state.disabled.push(skillName)
+      state.meta[skillName] = pickMeta(catalog.byName.get(skillName))
+      applied.push(skillName)
+    } else if (op === 'assign') {
+      if (state.assignments[skillName] === groupId) {
+        skipped.push(skillName)
+        continue
+      }
+      state.assignments[skillName] = groupId
+      applied.push(skillName)
+    } else if (state.assignments[skillName] === undefined) {
+      skipped.push(skillName)
+    } else {
+      delete state.assignments[skillName]
+      applied.push(skillName)
+    }
+  }
+  return { changed: applied.length > 0, result: { op, applied, skipped, groupId } }
+}
+
+/** Reorder groups to the exact id order; anything but a full permutation throws. */
+function reorderGroups(state, rawIds) {
+  const ids = Array.isArray(rawIds) ? rawIds.filter((id) => typeof id === 'string') : []
+  const current = state.groups.map((group) => group.id)
+  if (ids.length !== current.length || new Set(ids).size !== ids.length) {
+    throw new Error('reorder_groups needs every group id exactly once')
+  }
+  const byId = new Map(state.groups.map((group) => [group.id, group]))
+  const ordered = []
+  for (const id of ids) {
+    const group = byId.get(id)
+    if (group === undefined) throw new Error(`unknown group id "${id}"`)
+    ordered.push(group)
+  }
+  if (ordered.every((group, index) => group === state.groups[index])) return false
+  state.groups = ordered
+  return true
 }
 
 function requireSkillName(value) {
@@ -543,6 +662,11 @@ function summarize(payload) {
     `${payload.stats.enabled} of ${payload.stats.total} skills are on` +
       (payload.stats.complete ? '.' : ' (catalog discovery was incomplete; values may be stale).'),
   ]
+  if (payload.result !== undefined && payload.result !== null) {
+    const applied = Array.isArray(payload.result.applied) ? payload.result.applied.length : 0
+    const skipped = Array.isArray(payload.result.skipped) ? payload.result.skipped.length : 0
+    lines.push(`Batch ${payload.result.op}: ${applied} applied, ${skipped} skipped.`)
+  }
   const buckets = new Map([['', []]])
   for (const group of payload.groups) buckets.set(group.id, [])
   for (const skill of payload.skills) {

@@ -4,6 +4,27 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-11-02
+
+### Added
+
+- **Group management.** Rename a group in place, and reorder groups by dragging
+  their `⠿` handle; the order is persisted in the state file.
+- **Batch operations.** Select skills with per-row checkboxes or a section-wide
+  checkbox, then enable, disable, move into a group, or remove from a group in
+  one request. New `batch` action reports `applied` and `skipped`, and unknown
+  names are skipped instead of failing the whole batch.
+- **Collapse / expand.** Every group header collapses, plus a global
+  collapse-all / expand-all control; the state is remembered per browser.
+- New Host actions `rename_group`, `reorder_groups`, and `batch`, mirrored in
+  the `skill_manager` tool.
+
+### Changed
+
+- The panel no longer renders an empty Ungrouped section, while named groups
+  stay visible when empty so a freshly created group has a place to fill.
+- Batch results surface as a short confirmation note under the toolbar.
+
 ## [1.1.1] - 2026-11-01
 
 ### Changed
