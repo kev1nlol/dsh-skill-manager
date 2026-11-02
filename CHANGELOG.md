@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2026-11-02
+
+### Fixed
+
+- The collapse chevron rendered like a punctuation dot at 9px on dark themes;
+  it is now 12px, and the group move and menu glyphs share one 13px size so the
+  three controls read as a set.
+
 ## [1.6.1] - 2026-11-02
 
 ### Changed
