@@ -963,8 +963,10 @@ window.__ModuleLoader__.load({
           }))
         }
 
-        const allCollapsed = groups.length > 0 && groups.every((group) => collapsed.has(group.id)) &&
-          (ungrouped.length === 0 || collapsed.has('ungrouped'))
+        // Every rendered section, Ungrouped included: "collapse all" must keep
+        // working even when there are no named groups at all.
+        const sectionKeys = (ungrouped.length > 0 ? ['ungrouped'] : []).concat(groups.map((group) => group.id))
+        const allCollapsed = sectionKeys.length > 0 && sectionKeys.every((key) => collapsed.has(key))
 
         const header = h('header', { style: S.header }, [
           h('div', { key: 'titles', style: { minWidth: 0 } }, [
