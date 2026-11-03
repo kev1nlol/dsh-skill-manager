@@ -402,20 +402,6 @@ window.__ModuleLoader__.load({
         flex: '0 0 auto',
         opacity: 0.6,
       },
-      chevron: {
-        width: 16,
-        height: 18,
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        border: 'none',
-        background: 'transparent',
-        color: 'var(--dsw-alias-label-secondary)',
-        cursor: 'pointer',
-        padding: 0,
-        fontSize: 12,
-        flex: '0 0 auto',
-      },
       groupName: { fontSize: 13, fontWeight: 600, color: 'var(--dsw-alias-label-primary)', flex: '0 0 auto' },
       groupCount: {
         fontSize: 11,
@@ -598,7 +584,6 @@ window.__ModuleLoader__.load({
     const STYLE_TEXT = [
       '.sm-panel .sm-row:hover { background: var(--dsw-alias-bg-layer-1); }',
       '.sm-panel .sm-row { transition: background 120ms ease; }',
-      '.sm-panel .sm-group-head:hover .sm-chevron { color: var(--dsw-alias-label-primary); }',
       '.sm-panel .sm-group-head:hover .sm-grip { opacity: 1; }',
       '.sm-panel .sm-quiet:hover:not(:disabled) { color: var(--dsw-alias-label-primary); }',
       '.sm-panel .sm-picker:hover, .sm-panel .sm-picker:focus-visible { border-color: var(--dsw-alias-border-l1); }',
@@ -834,28 +819,18 @@ window.__ModuleLoader__.load({
           style: S.checkbox,
         }))
       }
-      if (group !== null && !ui.selectionMode) {
-        head.push(h('span', {
-          key: 'grip',
-          className: 'sm-grip',
-          title: t('page.dragHint'),
-          'aria-label': t('page.dragHint'),
-          style: S.grip,
-        }, '⠿'))
+      if (!ui.selectionMode) {
+        head.push(group !== null
+          ? h('span', {
+            key: 'grip',
+            className: 'sm-grip',
+            title: t('page.dragHint'),
+            'aria-label': t('page.dragHint'),
+            style: S.grip,
+          }, '⠿')
+          // Keep the ungrouped title on the same baseline as named groups.
+          : h('span', { key: 'gripSpacer', style: { width: 16, flex: '0 0 auto' } }))
       }
-      head.push(h('button', {
-        key: 'chevron',
-        type: 'button',
-        className: 'sm-chevron',
-        'aria-expanded': collapsed ? 'false' : 'true',
-        'aria-label': collapsed ? t('page.expand') : t('page.collapse'),
-        title: collapsed ? t('page.expand') : t('page.collapse'),
-        onClick: (event) => {
-          event.stopPropagation()
-          ui.onToggleCollapse(sectionKey)
-        },
-        style: S.chevron,
-      }, collapsed ? '▸' : '▾'))
 
       if (renaming) {
         head.push(h('input', {
@@ -889,7 +864,7 @@ window.__ModuleLoader__.load({
         head.push(h('span', { key: 'count', style: S.groupCount }, props.countLabel))
         head.push(h('span', { key: 'spacer', style: S.spacer }))
         if (group !== null && !ui.selectionMode) {
-          head.push(menuNode(t, ui, group, menuOpen, isFirst, isLast))
+          head.push(menuNode(t, ui, group, menuOpen, isFirst, isLast, collapsed))
         }
       }
 
@@ -938,6 +913,7 @@ window.__ModuleLoader__.load({
           key: 'head',
           className: 'sm-group-head',
           style: S.groupHead,
+          title: collapsed ? t('page.expand') : t('page.collapse'),
           draggable: group !== null && !ui.selectionMode,
           onDragStart: group !== null && !ui.selectionMode
             ? (event) => {
@@ -965,8 +941,13 @@ window.__ModuleLoader__.load({
      * Group actions sit behind one overflow control so the header stays a
      * single quiet row: order, name, count, then the move controls.
      */
-    function menuNode(t, ui, group, open, isFirst, isLast) {
+    function menuNode(t, ui, group, open, isFirst, isLast, collapsed) {
       const items = [
+        {
+          key: 'collapse',
+          label: collapsed ? t('page.expand') : t('page.collapse'),
+          run: () => ui.onToggleCollapse(group.id),
+        },
         { key: 'up', label: t('page.moveUp'), disabled: isFirst, run: () => ui.onMoveGroup(group.id, -1) },
         { key: 'down', label: t('page.moveDown'), disabled: isLast, run: () => ui.onMoveGroup(group.id, 1) },
         { key: 'top', label: t('page.moveTop'), disabled: isFirst, run: () => ui.onMoveTop(group.id) },

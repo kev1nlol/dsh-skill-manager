@@ -66,7 +66,7 @@ plugin_manager install_bundle → D:\path\to\dsh-skill-manager
 3. 用每行右侧的「移到…」选目标分组，即可把技能移过去（已归组的还能选「未分组」）；
 4. 用每行最右侧的开关停止 / 恢复索引，筛选计数立刻更新；
 5. 用搜索框按名称 / 描述 / 来源过滤，或点顶部「全部 / 已启用 / 已关闭」筛选标签只看某一类；
-6. 点分组标题（或前面的 `▾` / `▸`）折叠、展开；拖住组头左侧的 `⠿` 手柄排序，靠近面板上下边缘会自动滚动；`⋯` 菜单可上移 / 下移 / 置顶 / 置底 / 重命名 / 删除；
+6. 点分组标题整行折叠 / 展开（标题有悬停提示，`⋯` 菜单里也有「折叠 / 展开」）；拖住组头左侧的 `⠿` 手柄排序，靠近面板上下边缘会自动滚动；`⋯` 菜单可上移 / 下移 / 置顶 / 置底 / 重命名 / 删除；
 7. 点「批量管理」进入批量模式：勾选行或整节（点行文字也能选中），工具栏变成批量操作条，选完后点「完成」退出；
 8. `Esc` 逐层退出：先关菜单，再取消重命名，再清空搜索，最后退出批量模式。
 
@@ -179,7 +179,7 @@ Harness skills come from many places (bundled packages, `~/.dsh/skills`, project
 ## Features
 
 - **Sidebar entry.** A `SKILL 管理` / `SKILL Manager` icon in the left rail (order 15) opens a full main panel.
-- **Groups that are easy to manage.** Click a group header (or its chevron) to collapse or expand; drag the `⠿` grip on a header to reorder groups (the panel auto-scrolls near its edges), and the `⋯` menu keeps move up / down / to top / to bottom as a keyboard-accessible fallback. The order is persisted.
+- **Groups that are easy to manage.** Click a group header to collapse or expand (the overflow menu also carries Collapse / Expand); drag the `⠿` grip on a header to reorder groups (the panel auto-scrolls near its edges), and the `⋯` menu keeps move up / down / to top / to bottom as a keyboard-accessible fallback. The order is persisted.
 - **Search and filters.** Filter by name, description, or source with the search box, or click the count chips (All / Enabled / Disabled); while filtering, group headers show visible/total.
 - **Batch operations.** *Batch actions* swaps the action row into selection controls: select all / invert / clear, enable / disable, move / remove, and Done. There is no floating overlay, and select-all and invert touch only the visible rows.
 - **Collapse and expand.** Every group header collapses, plus a global collapse/expand control; the state is remembered in the browser.
@@ -231,7 +231,7 @@ If you prefer editing the profile patch yourself, add the bundle row:
 3. Use the row's *Move to…* picker to send that skill to another group, or back to *Ungrouped*.
 4. Use the on/off pill on the right of a row to stop or resume indexing that skill; the filter counts update immediately.
 5. Filter with the search box, or click the count chips (All / Enabled / Disabled).
-6. Click a group header (or its `▾` / `▸`) to collapse or expand; drag the `⠿` grip on a header to reorder groups (auto-scroll near the edges), and the `⋯` menu offers move up / down / to top / to bottom, rename, and delete.
+6. Click a group header to collapse or expand (the `⋯` menu also carries Collapse / Expand); drag the `⠿` grip on a header to reorder groups (auto-scroll near the edges), and the `⋯` menu offers move up / down / to top / to bottom, rename, and delete.
 7. Turn on *Batch actions*: tick rows or a whole section (clicking a row's text also toggles it); the action row becomes the batch controls, and *Done* exits.
 8. `Esc` backs out one layer: the menu, a rename, the search, then batch mode.
 
