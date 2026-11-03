@@ -58,6 +58,7 @@ window.__ModuleLoader__.load({
       'page.collapseAll': '全部折叠',
       'page.expandAll': '全部展开',
       'page.actions': '更多操作',
+      'page.dragHint': '拖动排序',
       'page.moveUp': '上移',
       'page.moveDown': '下移',
       'page.moveTop': '置顶',
@@ -125,6 +126,7 @@ window.__ModuleLoader__.load({
       'page.collapseAll': 'Collapse all',
       'page.expandAll': 'Expand all',
       'page.actions': 'More actions',
+      'page.dragHint': 'Drag to reorder',
       'page.moveUp': 'Move up',
       'page.moveDown': 'Move down',
       'page.moveTop': 'Move to top',
@@ -385,6 +387,21 @@ window.__ModuleLoader__.load({
         minHeight: 30,
         cursor: 'pointer',
       },
+      grip: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 22,
+        height: 22,
+        borderRadius: 4,
+        color: 'var(--dsw-alias-label-secondary)',
+        fontSize: 12,
+        lineHeight: '16px',
+        cursor: 'grab',
+        userSelect: 'none',
+        flex: '0 0 auto',
+        opacity: 0.7,
+      },
       chevron: {
         width: 18,
         height: 18,
@@ -582,6 +599,7 @@ window.__ModuleLoader__.load({
       '.sm-panel .sm-row:hover { background: var(--dsw-alias-bg-layer-1); }',
       '.sm-panel .sm-row { transition: background 120ms ease; }',
       '.sm-panel .sm-group-head:hover .sm-chevron { color: var(--dsw-alias-label-primary); }',
+      '.sm-panel .sm-group-head:hover .sm-grip { opacity: 1; }',
       '.sm-panel .sm-quiet:hover:not(:disabled) { color: var(--dsw-alias-label-primary); }',
       '.sm-panel .sm-picker:hover, .sm-panel .sm-picker:focus-visible { border-color: var(--dsw-alias-border-l1); }',
       '.sm-panel .sm-menu-item:hover:not(:disabled) { background: var(--dsw-alias-bg-layer-2); }',
@@ -862,32 +880,13 @@ window.__ModuleLoader__.load({
         head.push(h('span', { key: 'count', style: S.groupCount }, props.countLabel))
         head.push(h('span', { key: 'spacer', style: S.spacer }))
         if (group !== null && !ui.selectionMode) {
-          head.push(h('button', {
-            key: 'up',
-            type: 'button',
-            className: 'sm-quiet',
-            style: S.iconButton,
-            title: t('page.moveUp'),
-            'aria-label': t('page.moveUp'),
-            disabled: ui.pending !== '' || isFirst,
-            onClick: (event) => {
-              event.stopPropagation()
-              ui.onMoveGroup(group.id, -1)
-            },
-          }, '↑'))
-          head.push(h('button', {
-            key: 'down',
-            type: 'button',
-            className: 'sm-quiet',
-            style: S.iconButton,
-            title: t('page.moveDown'),
-            'aria-label': t('page.moveDown'),
-            disabled: ui.pending !== '' || isLast,
-            onClick: (event) => {
-              event.stopPropagation()
-              ui.onMoveGroup(group.id, 1)
-            },
-          }, '↓'))
+          head.push(h('span', {
+            key: 'grip',
+            className: 'sm-grip',
+            title: t('page.dragHint'),
+            'aria-label': t('page.dragHint'),
+            style: S.grip,
+          }, '⠿'))
           head.push(menuNode(t, ui, group, menuOpen, isFirst, isLast))
         }
       }
@@ -916,11 +915,39 @@ window.__ModuleLoader__.load({
         ])
         : null
 
-      return h('section', { style: props.first === true ? S.section : S.sectionDivided }, [
+      const dragged = group !== null && ui.dragId === group.id
+      const dropEdge = group !== null && ui.dragOver !== null && ui.dragOver.id === group.id
+        ? ui.dragOver.edge
+        : null
+      const sectionStyle = Object.assign(
+        {},
+        props.first === true ? S.section : S.sectionDivided,
+        dragged ? { opacity: 0.4 } : {},
+        dropEdge === 'before' ? { boxShadow: 'inset 0 2px 0 0 var(--dsw-alias-brand-primary)' } : {},
+        dropEdge === 'after' ? { boxShadow: 'inset 0 -2px 0 0 var(--dsw-alias-brand-primary)' } : {},
+      )
+
+      return h('section', {
+        style: sectionStyle,
+        onDragOver: group !== null ? (event) => ui.onSectionDragOver(group, event) : undefined,
+        onDrop: group !== null ? (event) => ui.onSectionDrop(group, event) : undefined,
+      }, [
         h('div', {
           key: 'head',
           className: 'sm-group-head',
           style: S.groupHead,
+          draggable: group !== null && !ui.selectionMode,
+          onDragStart: group !== null && !ui.selectionMode
+            ? (event) => {
+              if (event.target !== null && event.target.closest !== undefined
+                && event.target.closest('button,input,select')) {
+                event.preventDefault()
+                return
+              }
+              ui.onDragStart(group.id, event)
+            }
+            : undefined,
+          onDragEnd: group !== null && !ui.selectionMode ? () => ui.onDragEnd() : undefined,
           onClick: (event) => {
             if (event.target !== null && event.target.closest !== undefined
               && event.target.closest('button,input,select,label')) return
@@ -1009,7 +1036,11 @@ window.__ModuleLoader__.load({
         const [selectionMode, setSelectionMode] = React.useState(false)
         const [query, setQuery] = React.useState('')
         const [statusFilter, setStatusFilter] = React.useState('all')
+        const [dragId, setDragId] = React.useState(null)
+        const [dragOver, setDragOver] = React.useState(null)
         const alive = React.useRef(true)
+        const dragging = React.useRef(null)
+        const pageRef = React.useRef(null)
 
         React.useEffect(() => () => {
           alive.current = false
@@ -1327,6 +1358,75 @@ window.__ModuleLoader__.load({
         const onMoveTop = (groupId) => moveGroup(groupId, 0)
         const onMoveBottom = (groupId) => moveGroup(groupId, groups.length - 1)
 
+        const onDragStart = (groupId, event) => {
+          try {
+            event.dataTransfer.effectAllowed = 'move'
+            event.dataTransfer.setData('text/plain', groupId)
+          } catch {
+            // Some webviews expose a read-only dataTransfer; the ref still works.
+          }
+          dragging.current = groupId
+          setDragId(groupId)
+          setDragOver(null)
+        }
+
+        const onDragEnd = () => {
+          dragging.current = null
+          setDragId(null)
+          setDragOver(null)
+        }
+
+        const onSectionDragOver = (group, event) => {
+          if (dragging.current === null || group.id === dragging.current) return
+          event.preventDefault()
+          if (event.dataTransfer !== null) event.dataTransfer.dropEffect = 'move'
+          const rect = event.currentTarget.getBoundingClientRect()
+          const edge = event.clientY < rect.top + rect.height / 2 ? 'before' : 'after'
+          setDragOver((current) => (
+            current !== null && current.id === group.id && current.edge === edge
+              ? current
+              : { id: group.id, edge }
+          ))
+        }
+
+        const onSectionDrop = (group, event) => {
+          event.preventDefault()
+          const source = dragging.current
+          const rect = event.currentTarget.getBoundingClientRect()
+          const after = event.clientY > rect.top + rect.height / 2
+          onDragEnd()
+          if (source === null || source === group.id) return
+          const ids = groups.map((entry) => entry.id)
+          const from = ids.indexOf(source)
+          const target = ids.indexOf(group.id)
+          if (from < 0 || target < 0) return
+          const ordered = ids.slice()
+          ordered.splice(from, 1)
+          let insertAt = after ? target + 1 : target
+          if (insertAt > from) insertAt -= 1
+          if (insertAt < 0) insertAt = 0
+          if (insertAt > ordered.length) insertAt = ordered.length
+          ordered.splice(insertAt, 0, source)
+          if (ordered.join('|') === ids.join('|')) return
+          act({ action: 'reorder_groups', ids: ordered }, 'group:reorder')
+        }
+
+        // A native drag suppresses wheel scrolling, so the panel scrolls itself
+        // while the pointer sits near its top or bottom edge.
+        const onPageDragOver = (event) => {
+          if (dragging.current === null) return
+          const node = pageRef.current
+          if (node === null) return
+          const rect = node.getBoundingClientRect()
+          const edge = 72
+          const step = (distance) => Math.min(40, 6 + Math.ceil(distance / 3))
+          if (event.clientY < rect.top + edge) {
+            node.scrollTop -= step(rect.top + edge - event.clientY)
+          } else if (event.clientY > rect.bottom - edge) {
+            node.scrollTop += step(event.clientY - (rect.bottom - edge))
+          }
+        }
+
         const ui = {
           t,
           pending,
@@ -1351,6 +1451,12 @@ window.__ModuleLoader__.load({
           onMoveGroup,
           onMoveTop,
           onMoveBottom,
+          dragId,
+          dragOver,
+          onDragStart,
+          onDragEnd,
+          onSectionDragOver,
+          onSectionDrop,
           onOpenMenu: (groupId) => setMenuGroupId(groupId),
           onCloseMenu: () => setMenuGroupId(null),
         }
@@ -1643,7 +1749,12 @@ window.__ModuleLoader__.load({
         children.push(h('div', { key: 'rule', style: S.rule }))
         children.push(...body, footer)
 
-        return h('div', { className: 'sm-panel', style: S.page }, [
+        return h('div', {
+          className: 'sm-panel',
+          style: S.page,
+          ref: pageRef,
+          onDragOver: onPageDragOver,
+        }, [
           h('style', { key: 'sm-style' }, STYLE_TEXT),
           h('div', { key: 'inner', style: S.inner }, children),
         ])

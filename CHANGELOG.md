@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-11-03
+
+### Changed
+
+- **Group reordering is drag-and-drop again**, replacing the header arrow
+  buttons. Each group header carries a `⠿` grip; the dragged group fades, the
+  panel auto-scrolls while the pointer sits near its top or bottom edge, and a
+  2px insertion line shows whether the drop lands before or after the target.
+- The `⋯` menu keeps move up / down / to top / to bottom as a
+  keyboard-accessible fallback, so reordering never depends on a pointer.
+
 ## [1.7.1] - 2026-11-03
 
 ### Changed

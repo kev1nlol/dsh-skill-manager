@@ -17,7 +17,7 @@ Harness 的技能来自很多地方（内置包、`~/.dsh/skills`、项目目录
 ## 功能
 
 - **侧栏入口**：左栏出现 `SKILL 管理` 图标（order 15），点开是完整的主面板。
-- **分组管理**：点分组标题即可折叠 / 展开；标题右侧 `↑` / `↓` 调整顺序，「⋯」菜单里还有置顶 / 置底 / 重命名 / 删除分组，顺序会持久化。
+- **分组管理**：点分组标题即可折叠 / 展开；拖住组头右侧的 `⠿` 手柄调整顺序（拖到面板上下边缘会自动滚动），「⋯」菜单里保留上移 / 下移 / 置顶 / 置底作为键盘可达的兜底，顺序会持久化。
 - **搜索与筛选**：按名称 / 描述 / 来源搜索；顶部「全部 / 已启用 / 已关闭」是带计数的筛选标签，筛选时分组标题显示「可见/总数」。
 - **批量操作**：点「批量管理」后工具栏整行切换为批量操作条（全选 / 反选 / 清空，启用 / 关闭 / 移到分组 / 移出分组，完成），不做悬浮层；全选与反选只作用于当前可见技能。
 - **折叠 / 展开**：每个分组都能整体折叠，工具栏有「全部折叠 / 全部展开」，状态记在浏览器本地。
@@ -66,7 +66,7 @@ plugin_manager install_bundle → D:\path\to\dsh-skill-manager
 3. 用每行右侧的「移到…」选目标分组，即可把技能移过去（已归组的还能选「未分组」）；
 4. 用每行最右侧的开关停止 / 恢复索引，筛选计数立刻更新；
 5. 用搜索框按名称 / 描述 / 来源过滤，或点顶部「全部 / 已启用 / 已关闭」筛选标签只看某一类；
-6. 点分组标题（或前面的 `▾` / `▸`）折叠、展开；`↑` / `↓` 调整分组顺序，`⋯` 菜单可置顶 / 置底 / 重命名 / 删除；
+6. 点分组标题（或前面的 `▾` / `▸`）折叠、展开；拖住组头右侧的 `⠿` 手柄排序，靠近面板上下边缘会自动滚动；`⋯` 菜单可上移 / 下移 / 置顶 / 置底 / 重命名 / 删除；
 7. 点「批量管理」进入批量模式：勾选行或整节（点行文字也能选中），工具栏变成批量操作条，选完后点「完成」退出；
 8. `Esc` 逐层退出：先关菜单，再取消重命名，再清空搜索，最后退出批量模式。
 
@@ -133,7 +133,7 @@ plugin_manager install_bundle → D:\path\to\dsh-skill-manager
 - **面板不删技能**：要移除技能请去来源处删（`~/.dsh/skills/<name>/`、安装它的 bundle 等）。
 - **冷会话**：没有活动 Agent 的会话，`/` 菜单可能走 preset 作用域的注册表，此时按 Agent 的遮蔽不生效；发一条消息激活 Agent 后，下一次取数即按开关过滤。
 - **同源请求**：面板调用页面同源的 `/skill-manager/...`。已在 http 服务的 Web GUI 中验证；从 `file://` 加载界面的外壳可能解析不到这些路由。
-- **没有拖拽**：分组顺序用 `↑` / `↓` 和 `⋯` 菜单调整；技能归组用行内下拉或批量操作。
+- **技能不能拖拽归组**：分组本身用 `⠿` 手柄拖拽排序；技能归组用行内的「移到…」或批量操作。
 - **目录完整性**：某个 provider 发现不完整时，面板会提示，并展示最近一次可用结果。
 
 ## 开发
@@ -179,7 +179,7 @@ Harness skills come from many places (bundled packages, `~/.dsh/skills`, project
 ## Features
 
 - **Sidebar entry.** A `SKILL 管理` / `SKILL Manager` icon in the left rail (order 15) opens a full main panel.
-- **Groups that are easy to manage.** Click a group header (or its chevron) to collapse or expand; `↑` / `↓` reorder groups, and the `⋯` menu holds move-to-top, move-to-bottom, rename, and delete. The order is persisted.
+- **Groups that are easy to manage.** Click a group header (or its chevron) to collapse or expand; drag the `⠿` grip on a header to reorder groups (the panel auto-scrolls near its edges), and the `⋯` menu keeps move up / down / to top / to bottom as a keyboard-accessible fallback. The order is persisted.
 - **Search and filters.** Filter by name, description, or source with the search box, or click the count chips (All / Enabled / Disabled); while filtering, group headers show visible/total.
 - **Batch operations.** *Batch actions* swaps the action row into selection controls: select all / invert / clear, enable / disable, move / remove, and Done. There is no floating overlay, and select-all and invert touch only the visible rows.
 - **Collapse and expand.** Every group header collapses, plus a global collapse/expand control; the state is remembered in the browser.
@@ -231,7 +231,7 @@ If you prefer editing the profile patch yourself, add the bundle row:
 3. Use the row's *Move to…* picker to send that skill to another group, or back to *Ungrouped*.
 4. Use the on/off pill on the right of a row to stop or resume indexing that skill; the filter counts update immediately.
 5. Filter with the search box, or click the count chips (All / Enabled / Disabled).
-6. Click a group header (or its `▾` / `▸`) to collapse or expand; `↑` / `↓` reorder groups, and the `⋯` menu offers move-to-top, move-to-bottom, rename, and delete.
+6. Click a group header (or its `▾` / `▸`) to collapse or expand; drag the `⠿` grip on a header to reorder groups (auto-scroll near the edges), and the `⋯` menu offers move up / down / to top / to bottom, rename, and delete.
 7. Turn on *Batch actions*: tick rows or a whole section (clicking a row's text also toggles it); the action row becomes the batch controls, and *Done* exits.
 8. `Esc` backs out one layer: the menu, a rename, the search, then batch mode.
 
@@ -298,7 +298,7 @@ The same operations are available to the model as the `skill_manager` tool with 
 - **Skill files are read-only here.** The panel deliberately offers no "delete skill"; remove the skill at its source (`~/.dsh/skills/<name>/`, the installing bundle, and so on).
 - **Cold sessions.** The `/` skill menu of a session that has no live Agent can be served from the preset-scope registry, where the per-Agent shadow does not apply. Sending one message activates the Agent and the filter applies from the next fetch.
 - **Same-origin fetch.** The panel calls `/skill-manager/...` on the page's own origin. It is verified in the Web GUI served over http; a shell that loads the UI from `file://` may not resolve these routes.
-- **No drag and drop.** Groups are ordered with `↑` / `↓` and the `⋯` menu; regroup a skill with its row picker or the batch controls.
+- **No skill drag and drop.** Groups are reordered with the `⠿` grip; regroup a skill with its row picker or the batch controls.
 - **Catalog completeness.** If a provider's discovery is incomplete, the panel says so and shows the last usable view.
 
 ## Development
