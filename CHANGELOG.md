@@ -4,6 +4,23 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-11-03
+
+### Changed
+
+- **Rows carry a command, not a state mirror.** The section already names a
+  skill's group, so the per-row picker now offers *Move to…* targets (plus
+  *Ungrouped* for grouped skills) instead of repeating the current group name
+  on every row. Descriptions get the reclaimed width.
+- **Provider vocabulary is user-facing.** Raw roots (`user-dsh`, `bundled`,
+  `custom`) became short labels (用户安装 / 内置 / 自定义目录), with the raw value
+  kept in the tooltip; search matches the label too.
+- **One toolbar rhythm.** The always-visible new-group input now appears only
+  after pressing *New group*, and the two full-width rules around the toolbar
+  collapsed into a single rule before the list.
+- Type scale tightened to 18 / 13 / 12 / 11 so names lead over descriptions.
+- The state-file path moved from the footer into its tooltip.
+
 ## [1.6.2] - 2026-11-02
 
 ### Fixed

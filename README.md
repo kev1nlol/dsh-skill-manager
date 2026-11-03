@@ -62,8 +62,8 @@ plugin_manager install_bundle → D:\path\to\dsh-skill-manager
 ## 使用
 
 1. 从侧栏打开面板；
-2. 顶部输入框建分组（例如 `个人安装`、`官方内置`）；
-3. 用每行右侧的下拉把技能移入分组，或移回「未分组」；
+2. 点「新建分组」，输入名称后按回车或点「创建」；
+3. 用每行右侧的「移到…」选目标分组，即可把技能移过去（已归组的还能选「未分组」）；
 4. 用每行最右侧的开关停止 / 恢复索引，筛选计数立刻更新；
 5. 用搜索框按名称 / 描述 / 来源过滤，或点顶部「全部 / 已启用 / 已关闭」筛选标签只看某一类；
 6. 点分组标题（或前面的 `▾` / `▸`）折叠、展开；`↑` / `↓` 调整分组顺序，`⋯` 菜单可置顶 / 置底 / 重命名 / 删除；
@@ -228,7 +228,7 @@ If you prefer editing the profile patch yourself, add the bundle row:
 
 1. Open the SKILL Manager panel from the sidebar.
 2. Create a group (for example `个人安装` or `Official`) with the input at the top.
-3. Use the group picker on any row to move that skill into a group, or back to *Ungrouped*.
+3. Use the row's *Move to…* picker to send that skill to another group, or back to *Ungrouped*.
 4. Use the on/off pill on the right of a row to stop or resume indexing that skill; the filter counts update immediately.
 5. Filter with the search box, or click the count chips (All / Enabled / Disabled).
 6. Click a group header (or its `▾` / `▸`) to collapse or expand; `↑` / `↓` reorder groups, and the `⋯` menu offers move-to-top, move-to-bottom, rename, and delete.

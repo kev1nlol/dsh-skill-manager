@@ -31,6 +31,7 @@ window.__ModuleLoader__.load({
       'page.ungrouped': '未分组',
       'page.newGroup': '新分组名称',
       'page.addGroup': '新建分组',
+      'page.createGroup': '创建',
       'page.filterAll': '全部',
       'page.filterOn': '已启用',
       'page.filterOff': '已关闭',
@@ -69,6 +70,12 @@ window.__ModuleLoader__.load({
       'page.confirmDeleteGroup': '确认删除',
       'page.deleteHint': '只删除这个分组，组内技能回到「未分组」；技能、启用状态和文件都不会改变。',
       'page.groupPicker': '移动到分组',
+      'page.moveTo': '移到…',
+      'page.sourceBundled': '内置',
+      'page.sourceUser': '用户安装',
+      'page.sourceProject': '项目',
+      'page.sourceCustom': '自定义目录',
+      'page.sourceRuntime': '插件',
       'page.cancel': '取消',
       'page.note': '{applied} 项已应用，{skipped} 项跳过',
       'page.noteClean': '{applied} 项已应用',
@@ -78,7 +85,6 @@ window.__ModuleLoader__.load({
       'page.retry': '重试',
       'page.incomplete': '目录扫描不完整，这份列表可能有遗漏。',
       'page.noAgent': '当前没有活动会话，技能来源可能列不全。',
-      'page.savedTo': '状态文件',
     }
 
     const EN = {
@@ -91,7 +97,8 @@ window.__ModuleLoader__.load({
       'page.emptyGroup': 'No skills',
       'page.ungrouped': 'Ungrouped',
       'page.newGroup': 'New group name',
-      'page.addGroup': 'Create group',
+      'page.addGroup': 'New group',
+      'page.createGroup': 'Create',
       'page.filterAll': 'All',
       'page.filterOn': 'Enabled',
       'page.filterOff': 'Off',
@@ -130,6 +137,12 @@ window.__ModuleLoader__.load({
       'page.confirmDeleteGroup': 'Delete',
       'page.deleteHint': 'Only this group goes away; its skills return to Ungrouped. Skills, their on/off state, and their files stay untouched.',
       'page.groupPicker': 'Move to group',
+      'page.moveTo': 'Move to…',
+      'page.sourceBundled': 'Built in',
+      'page.sourceUser': 'User',
+      'page.sourceProject': 'Project',
+      'page.sourceCustom': 'Custom dir',
+      'page.sourceRuntime': 'Plugin',
       'page.cancel': 'Cancel',
       'page.note': '{applied} applied, {skipped} skipped',
       'page.noteClean': '{applied} applied',
@@ -139,7 +152,6 @@ window.__ModuleLoader__.load({
       'page.retry': 'Retry',
       'page.incomplete': 'Discovery was incomplete, so this list may miss skills.',
       'page.noAgent': 'No live session right now, so sources may be incomplete.',
-      'page.savedTo': 'State file',
     }
 
     const S = {
@@ -156,7 +168,7 @@ window.__ModuleLoader__.load({
       title: { margin: 0, fontSize: 18, fontWeight: 600, lineHeight: '24px', letterSpacing: '0.01em' },
       subtitle: {
         margin: '4px 0 0',
-        fontSize: 12.5,
+        fontSize: 12,
         lineHeight: '18px',
         color: 'var(--dsw-alias-label-secondary)',
         maxWidth: 520,
@@ -493,7 +505,7 @@ window.__ModuleLoader__.load({
       },
       skillName: {
         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
-        fontSize: 12.5,
+        fontSize: 13,
         color: 'var(--dsw-alias-label-primary)',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -545,14 +557,14 @@ window.__ModuleLoader__.load({
         background: 'transparent',
         color: 'var(--dsw-alias-label-secondary)',
         font: 'inherit',
-        fontSize: 11.5,
+        fontSize: 12,
         cursor: 'pointer',
         flex: '0 0 auto',
         whiteSpace: 'nowrap',
       },
       statusDot: { width: 6, height: 6, borderRadius: 3, flex: '0 0 auto' },
-      emptyRow: { padding: '8px 0', fontSize: 11.5, color: 'var(--dsw-alias-label-secondary)', borderTop: '1px solid var(--dsw-alias-border-l1)' },
-      emptyState: { marginTop: 28, fontSize: 12.5, color: 'var(--dsw-alias-label-secondary)' },
+      emptyRow: { padding: '8px 0', fontSize: 12, color: 'var(--dsw-alias-label-secondary)', borderTop: '1px solid var(--dsw-alias-border-l1)' },
+      emptyState: { marginTop: 28, fontSize: 12, color: 'var(--dsw-alias-label-secondary)' },
       emptyAction: { marginTop: 10 },
       footer: {
         marginTop: 28,
@@ -603,6 +615,24 @@ window.__ModuleLoader__.load({
       return template.replace(/\{(\w+)\}/g, (match, key) => (
         values[key] === undefined ? match : String(values[key])
       ))
+    }
+
+    /**
+     * Provider roots are implementation vocabulary ("user-dsh", "bundled").
+     * The row shows a short user-facing label and keeps the raw value in the
+     * tooltip for anyone who needs provenance.
+     */
+    function sourceLabel(source, t) {
+      switch (source) {
+        case 'bundled': return t('page.sourceBundled')
+        case 'user-dsh':
+        case 'user-agents': return t('page.sourceUser')
+        case 'project-dsh':
+        case 'project-agents': return t('page.sourceProject')
+        case 'custom': return t('page.sourceCustom')
+        case 'runtime': return t('page.sourceRuntime')
+        default: return source
+      }
     }
 
     async function request(url, body) {
@@ -701,7 +731,11 @@ window.__ModuleLoader__.load({
       const selected = ui.selected.has(skill.name)
       const title = [h('span', { key: 'name', style: S.skillName }, skill.name)]
       if (typeof skill.source === 'string' && skill.source !== '') {
-        title.push(h('span', { key: 'source', style: S.source }, skill.source))
+        title.push(h('span', {
+          key: 'source',
+          style: S.source,
+          title: `${skill.source} / ${skill.provider ?? ''}`.trim(),
+        }, sourceLabel(skill.source, t)))
       }
       if (skill.available === false) {
         title.push(h('span', { key: 'missing', style: S.sourceMissing }, t('page.missing')))
@@ -728,19 +762,31 @@ window.__ModuleLoader__.load({
           ? h('div', { key: 'description', style: S.description, title: skill.description }, skill.description)
           : null,
       ]))
+      // The section already names the skill's group, so the row carries a
+      // command instead of a state mirror: pick a target group and it moves.
+      const moveOptions = [h('option', { key: 'placeholder', value: '' }, t('page.moveTo'))]
+      for (const group of ui.groups) {
+        if (group.id === skill.groupId) continue
+        moveOptions.push(h('option', { key: group.id, value: group.id }, group.name))
+      }
+      if (typeof skill.groupId === 'string' && skill.groupId !== '') {
+        moveOptions.push(h('option', { key: 'ungroup', value: '__ungroup__' }, t('page.ungrouped')))
+      }
       children.push(
         h('select', {
-          key: 'group',
+          key: 'move',
           className: 'sm-picker',
-          value: typeof skill.groupId === 'string' ? skill.groupId : '',
-          disabled: busy || ui.groups.length === 0,
-          onChange: (event) => ui.onAssignSkill(skill.name, event.target.value),
+          value: '',
+          disabled: busy || moveOptions.length === 1,
+          onChange: (event) => {
+            const target = event.target.value
+            if (target === '') return
+            ui.onAssignSkill(skill.name, target === '__ungroup__' ? '' : target)
+          },
           style: S.picker,
           title: t('page.groupPicker'),
           'aria-label': t('page.groupPicker'),
-        }, [h('option', { key: '', value: '' }, t('page.ungrouped'))].concat(
-          ui.groups.map((group) => h('option', { key: group.id, value: group.id }, group.name)),
-        )),
+        }, moveOptions),
         h(StatusToggle, {
           key: 'status',
           t,
@@ -962,6 +1008,7 @@ window.__ModuleLoader__.load({
         const [note, setNote] = React.useState('')
         const [pending, setPending] = React.useState('')
         const [draftGroup, setDraftGroup] = React.useState('')
+        const [creatingGroup, setCreatingGroup] = React.useState(false)
         const [confirmGroup, setConfirmGroup] = React.useState('')
         const [menuGroupId, setMenuGroupId] = React.useState(null)
         const [renaming, setRenaming] = React.useState(null)
@@ -997,9 +1044,11 @@ window.__ModuleLoader__.load({
           return () => document.removeEventListener('mousedown', onPointerDown)
         }, [menuGroupId])
 
-        // Escape backs out one layer at a time: menu, rename, search, batch.
+        // Escape backs out one layer at a time: menu, rename, new group, search, batch.
         React.useEffect(() => {
-          if (menuGroupId === null && !selectionMode && renaming === null && query === '') return undefined
+          if (menuGroupId === null && !selectionMode && renaming === null && query === '' && !creatingGroup) {
+            return undefined
+          }
           const onKeyDown = (event) => {
             if (event.key !== 'Escape') return
             if (menuGroupId !== null) {
@@ -1008,6 +1057,11 @@ window.__ModuleLoader__.load({
             }
             if (renaming !== null) {
               setRenaming(null)
+              return
+            }
+            if (creatingGroup) {
+              setCreatingGroup(false)
+              setDraftGroup('')
               return
             }
             if (query !== '') {
@@ -1021,7 +1075,7 @@ window.__ModuleLoader__.load({
           }
           window.addEventListener('keydown', onKeyDown)
           return () => window.removeEventListener('keydown', onKeyDown)
-        }, [menuGroupId, selectionMode, renaming, query])
+        }, [menuGroupId, selectionMode, renaming, query, creatingGroup])
 
         const fail = React.useCallback((failure) => {
           const network = failure !== null && typeof failure === 'object' && failure.network === true
@@ -1124,7 +1178,8 @@ window.__ModuleLoader__.load({
         const normalizedQuery = query.trim().toLowerCase()
         const matchesQuery = (skill) => {
           if (normalizedQuery === '') return true
-          const haystack = `${skill.name} ${skill.description ?? ''} ${skill.source ?? ''} ${skill.provider ?? ''}`.toLowerCase()
+          const haystack = `${skill.name} ${skill.description ?? ''} ${skill.source ?? ''} ` +
+            `${sourceLabel(skill.source ?? '', t)} ${skill.provider ?? ''}`.toLowerCase()
           return haystack.includes(normalizedQuery)
         }
         const matchesStatus = (skill) => statusFilter === 'all'
@@ -1219,7 +1274,10 @@ window.__ModuleLoader__.load({
           const name = draftGroup.trim()
           if (name === '') return
           const next = await act({ action: 'create_group', group: name }, 'group:create')
-          if (next !== null && alive.current) setDraftGroup('')
+          if (next !== null && alive.current) {
+            setDraftGroup('')
+            setCreatingGroup(false)
+          }
         }
 
         const onDeleteGroup = async (group, confirming) => {
@@ -1477,26 +1535,48 @@ window.__ModuleLoader__.load({
         const normalActions = selectionMode
           ? null
           : h('div', { key: 'actions', style: S.actions }, [
-            h('input', {
-              key: 'draft',
-              value: draftGroup,
-              placeholder: t('page.newGroup'),
-              'aria-label': t('page.newGroup'),
-              maxLength: 40,
-              style: S.input,
-              disabled: pending === 'group:create',
-              onChange: (event) => setDraftGroup(event.target.value),
-              onKeyDown: (event) => {
-                if (event.key === 'Enter') onCreateGroup()
-              },
-            }),
-            h('button', {
-              key: 'create',
-              type: 'button',
-              style: S.primary,
-              disabled: draftGroup.trim() === '' || pending === 'group:create',
-              onClick: onCreateGroup,
-            }, t('page.addGroup')),
+            creatingGroup
+              ? h('input', {
+                key: 'draft',
+                value: draftGroup,
+                autoFocus: true,
+                placeholder: t('page.newGroup'),
+                'aria-label': t('page.newGroup'),
+                maxLength: 40,
+                style: S.input,
+                disabled: pending === 'group:create',
+                onChange: (event) => setDraftGroup(event.target.value),
+                onKeyDown: (event) => {
+                  if (event.key === 'Enter') onCreateGroup()
+                },
+              })
+              : h('button', {
+                key: 'newGroup',
+                type: 'button',
+                style: S.secondary,
+                onClick: () => setCreatingGroup(true),
+              }, t('page.addGroup')),
+            creatingGroup
+              ? h('button', {
+                key: 'create',
+                type: 'button',
+                style: S.primary,
+                disabled: draftGroup.trim() === '' || pending === 'group:create',
+                onClick: onCreateGroup,
+              }, t('page.createGroup'))
+              : null,
+            creatingGroup
+              ? h('button', {
+                key: 'cancelCreate',
+                type: 'button',
+                className: 'sm-quiet',
+                style: S.textButton,
+                onClick: () => {
+                  setCreatingGroup(false)
+                  setDraftGroup('')
+                },
+              }, t('page.cancel'))
+              : null,
             h('span', { key: 'spacer', style: S.spacer }),
             h('button', {
               key: 'batchMode',
@@ -1521,7 +1601,7 @@ window.__ModuleLoader__.load({
                 setCollapsed(next)
               },
             }, allCollapsed ? t('page.expandAll') : t('page.collapseAll')),
-          ])
+          ].filter((node) => node !== null))
 
         const alerts = []
         if (error !== '') alerts.push(h('div', { key: 'error', style: S.alert }, error))
@@ -1557,15 +1637,18 @@ window.__ModuleLoader__.load({
           body = sections
         }
 
-        const footerText = typeof data?.statePath === 'string' && data.statePath !== ''
-          ? `${t('page.footer')}  ${t('page.savedTo')}: ${data.statePath}`
-          : t('page.footer')
-        const footer = h('div', { key: 'footer', style: S.footer }, footerText)
+        const statePath = data !== null && typeof data.statePath === 'string' ? data.statePath : ''
+        const footer = h('div', {
+          key: 'footer',
+          style: S.footer,
+          title: statePath !== '' ? statePath : undefined,
+        }, t('page.footer'))
 
-        const children = [masthead, h('div', { key: 'rule1', style: S.rule }), searchRow, h('div', { key: 'rule2', style: S.rule })]
+        const children = [masthead, searchRow]
         if (normalActions !== null) children.push(normalActions)
         if (selectionStrip !== null) children.push(selectionStrip)
         if (alerts.length > 0) children.push(h('div', { key: 'alerts', style: S.alerts }, alerts))
+        children.push(h('div', { key: 'rule', style: S.rule }))
         children.push(...body, footer)
 
         return h('div', { className: 'sm-panel', style: S.page }, [
