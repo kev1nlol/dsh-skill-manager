@@ -371,28 +371,19 @@ window.__ModuleLoader__.load({
         lineHeight: '18px',
         color: 'var(--dsw-alias-label-secondary)',
       },
-      section: { marginTop: 22 },
+      section: { marginTop: 20 },
       sectionDivided: {
-        marginTop: 24,
-        paddingTop: 14,
+        marginTop: 20,
+        paddingTop: 12,
         borderTop: '1px solid var(--dsw-alias-border-l2)',
       },
       groupHead: {
         display: 'flex',
         alignItems: 'center',
-        gap: 6,
+        gap: 8,
         padding: '4px 0',
         minHeight: 30,
         cursor: 'pointer',
-      },
-      order: {
-        width: 24,
-        textAlign: 'right',
-        fontSize: 11,
-        color: 'var(--dsw-alias-label-secondary)',
-        fontVariantNumeric: 'tabular-nums',
-        flex: '0 0 auto',
-        marginRight: 2,
       },
       chevron: {
         width: 18,
@@ -590,6 +581,7 @@ window.__ModuleLoader__.load({
     const STYLE_TEXT = [
       '.sm-panel .sm-row:hover { background: var(--dsw-alias-bg-layer-1); }',
       '.sm-panel .sm-row { transition: background 120ms ease; }',
+      '.sm-panel .sm-group-head:hover .sm-chevron { color: var(--dsw-alias-label-primary); }',
       '.sm-panel .sm-quiet:hover:not(:disabled) { color: var(--dsw-alias-label-primary); }',
       '.sm-panel .sm-picker:hover, .sm-panel .sm-picker:focus-visible { border-color: var(--dsw-alias-border-l1); }',
       '.sm-panel .sm-menu-item:hover:not(:disabled) { background: var(--dsw-alias-bg-layer-2); }',
@@ -812,9 +804,7 @@ window.__ModuleLoader__.load({
       const isFirst = group !== null && props.index === 0
       const isLast = group !== null && props.index === props.groupCount - 1
 
-      const head = [
-        h('span', { key: 'order', style: S.order }, group === null ? '–' : String(props.index + 1)),
-      ]
+      const head = []
       if (ui.selectionMode) {
         head.push(h('input', {
           key: 'selectSect',
@@ -829,6 +819,7 @@ window.__ModuleLoader__.load({
       head.push(h('button', {
         key: 'chevron',
         type: 'button',
+        className: 'sm-chevron',
         'aria-expanded': collapsed ? 'false' : 'true',
         'aria-label': collapsed ? t('page.expand') : t('page.collapse'),
         title: collapsed ? t('page.expand') : t('page.collapse'),
@@ -928,6 +919,7 @@ window.__ModuleLoader__.load({
       return h('section', { style: props.first === true ? S.section : S.sectionDivided }, [
         h('div', {
           key: 'head',
+          className: 'sm-group-head',
           style: S.groupHead,
           onClick: (event) => {
             if (event.target !== null && event.target.closest !== undefined

@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2026-11-03
+
+### Changed
+
+- Removed the fixed order column. Its empty gutter pushed every group title
+  inward and read as blank space once groups were collapsed; the disclosure
+  chevron now sits on the page's left edge and the title follows it, so headers
+  align with the search field and the rows.
+- Tightened group spacing and made the chevron brighten on header hover.
+
 ## [1.7.0] - 2026-11-03
 
 ### Changed
