@@ -382,7 +382,7 @@ window.__ModuleLoader__.load({
       groupHead: {
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
+        gap: 6,
         padding: '4px 0',
         minHeight: 30,
         cursor: 'pointer',
@@ -391,8 +391,8 @@ window.__ModuleLoader__.load({
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        width: 22,
-        height: 22,
+        width: 16,
+        height: 20,
         borderRadius: 4,
         color: 'var(--dsw-alias-label-secondary)',
         fontSize: 12,
@@ -400,10 +400,10 @@ window.__ModuleLoader__.load({
         cursor: 'grab',
         userSelect: 'none',
         flex: '0 0 auto',
-        opacity: 0.7,
+        opacity: 0.6,
       },
       chevron: {
-        width: 18,
+        width: 16,
         height: 18,
         display: 'inline-flex',
         alignItems: 'center',
@@ -834,6 +834,15 @@ window.__ModuleLoader__.load({
           style: S.checkbox,
         }))
       }
+      if (group !== null && !ui.selectionMode) {
+        head.push(h('span', {
+          key: 'grip',
+          className: 'sm-grip',
+          title: t('page.dragHint'),
+          'aria-label': t('page.dragHint'),
+          style: S.grip,
+        }, '⠿'))
+      }
       head.push(h('button', {
         key: 'chevron',
         type: 'button',
@@ -880,13 +889,6 @@ window.__ModuleLoader__.load({
         head.push(h('span', { key: 'count', style: S.groupCount }, props.countLabel))
         head.push(h('span', { key: 'spacer', style: S.spacer }))
         if (group !== null && !ui.selectionMode) {
-          head.push(h('span', {
-            key: 'grip',
-            className: 'sm-grip',
-            title: t('page.dragHint'),
-            'aria-label': t('page.dragHint'),
-            style: S.grip,
-          }, '⠿'))
           head.push(menuNode(t, ui, group, menuOpen, isFirst, isLast))
         }
       }

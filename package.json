@@ -1,6 +1,6 @@
 {
   "name": "@kev1nlol/dsh-skill-manager",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "SKILL 管理：给 DeepSeek Harness 已安装的技能分组、排序，并批量或逐个启用关闭，决定技能目录、skill 工具与 / 指令是否仍索引它。",
   "type": "module",
   "main": "index.js",
